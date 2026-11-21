@@ -613,88 +613,239 @@
     </div>
 
     <!-- ==================================================================== -->
-    <!-- TAB 5 PANEL: SETTINGS (WORKSPACE, APPS SCRIPT SYNC & DATA BACKUP)    -->
+    <!-- TAB 5 PANEL: SETTINGS (General | Security | Cloud Backup | Import)   -->
     <!-- ==================================================================== -->
-    <div id="panel-settings" class="tab-panel settings-stack" hidden>
-      <section class="analytics-card">
-        <div class="analytics-header compact">
-          <div>
-            <h2>Workspace &amp; Company Defaults</h2>
-            <p>Configure default RGE Project Tracker and Account Receivable settings saved to this device.</p>
-          </div>
-          <span class="analytics-pill">RGE PMO v2.0</span>
-        </div>
+    <div id="panel-settings" class="tab-panel settings-shell-card" hidden>
+      <div class="settings-split">
+        <!-- Left Sub-Navigation (Matches Reference Screenshot: General, Security, Backup, Import) -->
+        <aside class="settings-subnav" aria-label="Settings sections">
+          <h2 class="settings-heading">Settings</h2>
+          <nav class="settings-sublist">
+            <button type="button" class="settings-subbtn" data-settings-sub="general">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l-.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.6.85 1 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              <span>General</span>
+            </button>
+            <button type="button" class="settings-subbtn" data-settings-sub="security">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <span>Security</span>
+            </button>
+            <button type="button" class="settings-subbtn is-active" data-settings-sub="backup">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
+              <span>Backup</span>
+            </button>
+            <button type="button" class="settings-subbtn" data-settings-sub="import">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span>Import</span>
+            </button>
+          </nav>
+        </aside>
 
-        <form id="form-settings" class="settings-form-grid">
-          <div class="form-field">
-            <label for="set-company-name">Company Name</label>
-            <input type="text" id="set-company-name" value="RGE Infra &amp; Information Technology Services" />
-          </div>
-          <div class="form-field">
-            <label for="set-hq-address">Office Address</label>
-            <input type="text" id="set-hq-address" value="Unit 210, Don Raul Building, #77 Kamuning Road, Quezon City" />
-          </div>
-          <div class="form-field">
-            <label for="set-default-track">Default Service Track (New Projects)</label>
-            <select id="set-default-track" class="select-control">
-              <option value="supply-delivery">Supply &amp; Delivery</option>
-              <option value="supply-only">Supply only</option>
-              <option value="supply-install" selected>Supply &amp; Install</option>
-              <option value="install-services">Install/Services</option>
-            </select>
-          </div>
-          <div class="form-field">
-            <label for="set-default-status">Default Status (New Projects)</label>
-            <select id="set-default-status" class="select-control">
-              <option value="Survey">Survey</option>
-              <option value="Project awarded">Project awarded</option>
-              <option value="On-going project" selected>On-going project</option>
-              <option value="Project completed">Project completed</option>
-              <option value="Hold">Hold</option>
-            </select>
-          </div>
-          <div class="form-field full-span">
-            <label for="set-default-terms">Default AR Payment Terms</label>
-            <input type="text" id="set-default-terms" value="50% DP, 40% Progress Billing, 10% Completion" />
-          </div>
-          <div class="form-field full-span">
-            <label for="set-appscript-url">Google Apps Script Web App URL (Optional Sheets Sync)</label>
-            <input type="url" id="set-appscript-url" placeholder="https://script.google.com/macros/s/.../exec" />
-            <span class="settings-help-text">Paste your deployed Apps Script URL from <code>Appscript/code.gs</code> when ready to connect live Google Sheets sync.</span>
-          </div>
-          <div class="settings-actions-row full-span">
-            <button type="submit" class="btn btn-primary">Save Settings</button>
-          </div>
-        </form>
-      </section>
+        <!-- Right Settings Content Panes -->
+        <div class="settings-content">
+          <!-- PANE 1: CLOUD BACKUP (Default Active — Exact Layout from Reference Image) -->
+          <section class="settings-pane" data-settings-pane="backup">
+            <div class="cb-header">
+              <div>
+                <h3 class="cb-title">Cloud backup</h3>
+                <p class="cb-desc">Keep copies of your RGE Project Tracker &amp; Account Receivable data in your own Cloudflare R2 bucket. When encryption is enabled, only the encrypted file is uploaded.</p>
+              </div>
+              <button type="button" class="btn btn-outline btn-sm" id="cloud-btn-toggle-config">Configure R2</button>
+            </div>
 
-      <section class="analytics-card">
-        <div class="analytics-header compact">
-          <div>
-            <h2>Data Backup, Export &amp; Maintenance</h2>
-            <p>Download a complete backup of your Projects &amp; Account Receivable (PB1–PB10) records, or restore from JSON.</p>
-          </div>
-        </div>
+            <!-- Row 1: R2 Bucket Endpoint + Back up now -->
+            <div class="cb-action-card">
+              <div class="cb-card-left">
+                <span class="cb-icon-circle" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/><polyline points="12 12 12 16"/><polyline points="10 14 12 12 14 14"/></svg>
+                </span>
+                <div class="cb-card-text">
+                  <strong class="cb-endpoint" id="cloud-endpoint-label">rgeprojecttracker.pages.dev/api/sync</strong>
+                  <span class="cb-subtext" id="cloud-backup-status-sub">Not backed up yet this session.</span>
+                </div>
+              </div>
+              <button type="button" class="cb-pill-btn" id="cloud-btn-backup-now">Back up now</button>
+            </div>
 
-        <div class="settings-tools-grid">
-          <div class="settings-tool-box">
-            <h3>Full JSON Backup</h3>
-            <p>Exports all tracked projects, checklists, AR records (PB1–PB10), and preferences.</p>
-            <button type="button" class="btn btn-outline btn-sm" id="btn-backup-json">Download Backup (.json)</button>
-          </div>
-          <div class="settings-tool-box">
-            <h3>Restore Backup</h3>
-            <p>Import a previously exported RGE Tracker <code>.json</code> backup file onto this device.</p>
-            <label class="btn btn-outline btn-sm" for="input-restore-json" style="cursor:pointer">Import Backup (.json)</label>
-            <input type="file" id="input-restore-json" accept="application/json" hidden />
-          </div>
-          <div class="settings-tool-box danger-box">
-            <h3>Reset Demo Records</h3>
-            <p>Clears local edits and restores the default seeded RGE projects and AR ledger.</p>
-            <button type="button" class="btn btn-danger-ghost btn-sm" id="btn-settings-reset">Reset All Demo Data</button>
-          </div>
+            <!-- Row 2: Multi-Device Sync + Sync now -->
+            <div class="cb-action-card">
+              <div class="cb-card-left">
+                <span class="cb-icon-circle" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                </span>
+                <div class="cb-card-text">
+                  <strong>Sync</strong>
+                  <span class="cb-subtext" id="cloud-sync-status-sub">Ready to sync across desktop &amp; mobile devices</span>
+                </div>
+              </div>
+              <button type="button" class="cb-pill-btn" id="cloud-btn-sync-now">Sync now</button>
+            </div>
+
+            <!-- Row 3: Pair Phone / Other Device + Add a phone -->
+            <div class="cb-action-card">
+              <div class="cb-card-left">
+                <span class="cb-icon-circle" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                </span>
+                <div class="cb-card-text">
+                  <span class="cb-phone-copy">Set up RGE Project Tracker on your phone by scanning a code.</span>
+                </div>
+              </div>
+              <button type="button" class="cb-pill-btn" id="cloud-btn-add-phone">Add a phone</button>
+            </div>
+
+            <!-- Collapsible Cloudflare R2 Connection Configuration -->
+            <div class="cb-config-drawer" id="cloud-r2-config-box" hidden>
+              <h4>Cloudflare R2 Connection Settings</h4>
+              <div class="settings-form-grid">
+                <div class="form-field full-span">
+                  <label for="r2-mode">Connection Mode</label>
+                  <select id="r2-mode" class="select-control">
+                    <option value="worker">Cloudflare Pages Function + R2 Binding (/api/sync) — Recommended</option>
+                    <option value="direct-r2">Direct Cloudflare R2 S3 Endpoint (AWS SigV4)</option>
+                  </select>
+                </div>
+
+                <!-- Worker Mode Fields -->
+                <div class="form-field full-span" id="r2-worker-fields">
+                  <label for="r2-worker-url">Cloudflare Sync API URL</label>
+                  <input type="text" id="r2-worker-url" placeholder="/api/sync or https://rgeprojecttracker.pages.dev/api/sync" />
+                </div>
+
+                <!-- Direct R2 S3 Mode Fields -->
+                <div class="full-span settings-form-grid" id="r2-direct-fields" hidden>
+                  <div class="form-field">
+                    <label for="r2-endpoint">R2 S3 Endpoint URL</label>
+                    <input type="url" id="r2-endpoint" placeholder="https://<account-id>.r2.cloudflarestorage.com" />
+                  </div>
+                  <div class="form-field">
+                    <label for="r2-bucket">R2 Bucket Name</label>
+                    <input type="text" id="r2-bucket" placeholder="rge-project-tracker" />
+                  </div>
+                  <div class="form-field">
+                    <label for="r2-access-key">R2 Access Key ID</label>
+                    <input type="text" id="r2-access-key" placeholder="Paste R2 Access Key ID" />
+                  </div>
+                  <div class="form-field">
+                    <label for="r2-secret-key">R2 Secret Access Key</label>
+                    <input type="password" id="r2-secret-key" placeholder="Paste R2 Secret Access Key" />
+                  </div>
+                </div>
+
+                <div class="form-field">
+                  <label for="r2-workspace-id">Workspace ID (Shared Across Devices)</label>
+                  <input type="text" id="r2-workspace-id" placeholder="rge-main" />
+                </div>
+                <div class="form-field">
+                  <label for="r2-device-name">This Device Name</label>
+                  <input type="text" id="r2-device-name" placeholder="RGE-DESKTOP-01" />
+                </div>
+                <div class="form-field full-span">
+                  <label for="r2-sync-token">Optional Sync Secret Key (matches SYNC_SECRET env var)</label>
+                  <input type="password" id="r2-sync-token" placeholder="Optional team sync key" />
+                </div>
+                <div class="full-span settings-actions-row">
+                  <button type="button" class="btn btn-primary btn-sm" id="r2-btn-save-config">Save R2 Config</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Auto-Backup Toggle Row -->
+            <div class="cb-toggle-row">
+              <div>
+                <strong>Back up automatically</strong>
+                <span class="cb-subtext">A few seconds after each change.</span>
+              </div>
+              <label class="ios-switch" aria-label="Toggle automatic cloud backup">
+                <input type="checkbox" id="cloud-toggle-auto" checked />
+                <span class="ios-slider"></span>
+              </label>
+            </div>
+
+            <!-- Backups Version History List -->
+            <div class="cb-history-section">
+              <h4 class="cb-history-title">Backups</h4>
+              <div class="cb-history-list" id="cloud-backups-list"></div>
+            </div>
+          </section>
+
+          <!-- PANE 2: GENERAL SETTINGS -->
+          <section class="settings-pane" data-settings-pane="general" hidden>
+            <h3 class="cb-title">General Workspace Preferences</h3>
+            <p class="cb-desc">Configure default RGE Project Tracker and Account Receivable settings.</p>
+
+            <form id="form-settings" class="settings-form-grid" style="margin-top:1rem">
+              <div class="form-field">
+                <label for="set-company-name">Company Name</label>
+                <input type="text" id="set-company-name" value="RGE Infra &amp; Information Technology Services" />
+              </div>
+              <div class="form-field">
+                <label for="set-hq-address">Office Address</label>
+                <input type="text" id="set-hq-address" value="Unit 210, Don Raul Building, #77 Kamuning Road, Quezon City" />
+              </div>
+              <div class="form-field full-span">
+                <label for="set-default-terms">Default AR Payment Terms</label>
+                <input type="text" id="set-default-terms" value="50% DP, 40% Progress Billing, 10% Completion" />
+              </div>
+              <div class="settings-actions-row full-span">
+                <button type="submit" class="btn btn-primary btn-sm">Save General Settings</button>
+              </div>
+            </form>
+          </section>
+
+          <!-- PANE 3: SECURITY (End-to-End AES-256 Encryption for R2 Backups) -->
+          <section class="settings-pane" data-settings-pane="security" hidden>
+            <h3 class="cb-title">Backup Encryption &amp; Security</h3>
+            <p class="cb-desc">Optionally encrypt your workspace with AES-256-GCM before uploading to Cloudflare R2. Backups can only be opened with your master password.</p>
+
+            <div class="cb-toggle-row" style="margin-top:1rem">
+              <div>
+                <strong>Encrypt cloud backups (AES-256-GCM)</strong>
+                <span class="cb-subtext">Client-side encryption using PBKDF2 + Web Crypto API.</span>
+              </div>
+              <label class="ios-switch" aria-label="Toggle AES-256 encryption">
+                <input type="checkbox" id="sec-toggle-encrypt" />
+                <span class="ios-slider"></span>
+              </label>
+            </div>
+
+            <div class="settings-form-grid" style="margin-top:0.85rem">
+              <div class="form-field full-span">
+                <label for="sec-master-password">Master Backup Password</label>
+                <input type="password" id="sec-master-password" placeholder="Enter shared team password (min 6 characters)" />
+                <span class="settings-help-text">Use the same password on every synced desktop/phone so they can decrypt each other's R2 snapshots.</span>
+              </div>
+              <div class="settings-actions-row full-span">
+                <button type="button" class="btn btn-primary btn-sm" id="sec-btn-save">Save Security Settings</button>
+              </div>
+            </div>
+          </section>
+
+          <!-- PANE 4: IMPORT, EXPORT & RESET -->
+          <section class="settings-pane" data-settings-pane="import" hidden>
+            <h3 class="cb-title">Import, Export &amp; Maintenance</h3>
+            <p class="cb-desc">Download offline JSON backups, restore from file, or reset to the 5 clean sample projects.</p>
+
+            <div class="settings-tools-grid" style="margin-top:1rem">
+              <div class="settings-tool-box">
+                <h3>Full JSON Backup</h3>
+                <p>Exports all tracked projects, Project Awarded, Account Receivable (PB1–PB10), and settings.</p>
+                <button type="button" class="btn btn-outline btn-sm" id="btn-backup-json">Download Backup (.json)</button>
+              </div>
+              <div class="settings-tool-box">
+                <h3>Import Backup</h3>
+                <p>Restore a previously exported RGE Tracker <code>.json</code> file onto this device.</p>
+                <label class="btn btn-outline btn-sm" for="input-restore-json" style="cursor:pointer">Import Backup (.json)</label>
+                <input type="file" id="input-restore-json" accept="application/json" hidden />
+              </div>
+              <div class="settings-tool-box danger-box">
+                <h3>Reset Sample Data</h3>
+                <p>Clears local edits and restores the 5 clean sample projects &amp; AR records.</p>
+                <button type="button" class="btn btn-danger-ghost btn-sm" id="btn-settings-reset">Reset 5 Sample Projects</button>
+              </div>
+            </div>
+          </section>
         </div>
-      </section>
+      </div>
     </div>
     </main>
   </div>
@@ -947,11 +1098,36 @@
     </div>
   </aside>
 
+  <!-- ====================================================================== -->
+  <!-- PAIR PHONE / DEVICE QR CODE MODAL                                      -->
+  <!-- ====================================================================== -->
+  <div class="modal-backdrop" id="pair-modal-backdrop" aria-hidden="true">
+    <div class="modal-dialog pair-modal-sm" role="dialog" aria-modal="true" aria-labelledby="pair-modal-title">
+      <div class="modal-header">
+        <div>
+          <h2 id="pair-modal-title">Add a Phone or Another Device</h2>
+          <p class="modal-subtitle">Scan this QR code or open the pairing link on your phone to sync your Cloudflare R2 workspace automatically.</p>
+        </div>
+        <button class="close-icon-btn dark" id="pair-btn-close" type="button" aria-label="Close pairing modal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="pair-modal-body">
+        <div class="pair-qr-stage" id="pair-qr-box"></div>
+        <div class="pair-link-row">
+          <input type="text" id="pair-url-output" readonly aria-label="Device pairing link" />
+          <button type="button" class="btn btn-primary btn-sm" id="pair-btn-copy">Copy Link</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="toast-stack" id="toast-stack" aria-live="polite"></div>
 
   <script src="data.js"></script>
   <script src="ar.js"></script>
   <script src="awarded.js"></script>
+  <script src="cloud-sync.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

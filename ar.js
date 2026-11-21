@@ -233,6 +233,7 @@ window.RGE_AR_MODULE = (() => {
     try {
       localStorage.setItem(AR_STORAGE_KEY, JSON.stringify(arState.records));
     } catch (_) {}
+    if (window.RGE_CLOUD_SYNC) window.RGE_CLOUD_SYNC.scheduleAutoBackup();
   }
 
   function fmtMoney(val, compact = false) {

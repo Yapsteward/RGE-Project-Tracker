@@ -97,10 +97,7 @@
     const defaults = {
       companyName: "RGE Infra & Information Technology Services",
       hqAddress: "Unit 210, Don Raul Building, #77 Kamuning Road, Quezon City",
-      defaultTrack: "supply-install",
-      defaultStatus: "On-going project",
-      defaultTerms: "50% DP, 40% Progress Billing, 10% Completion",
-      appScriptUrl: ""
+      defaultTerms: "50% DP, 40% Progress Billing, 10% Completion"
     };
     try {
       const saved = localStorage.getItem(SETTINGS_KEY);
@@ -120,10 +117,7 @@
     const setVal = (id, v) => { const node = document.getElementById(id); if (node) node.value = v || ""; };
     setVal("set-company-name", s.companyName);
     setVal("set-hq-address", s.hqAddress);
-    setVal("set-default-track", s.defaultTrack);
-    setVal("set-default-status", s.defaultStatus);
     setVal("set-default-terms", s.defaultTerms);
-    setVal("set-appscript-url", s.appScriptUrl);
   }
 
   function loadProjects() {
@@ -141,6 +135,7 @@
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state.projects));
     } catch (_) {}
+    if (window.RGE_CLOUD_SYNC) window.RGE_CLOUD_SYNC.scheduleAutoBackup();
   }
 
   function formatPHP(amount, compact = false) {
@@ -1089,7 +1084,7 @@
       } else if (state.activeTab === "awarded" && window.RGE_AWARDED_MODULE) {
         window.RGE_AWARDED_MODULE.openDrawer(null);
       } else {
-        openAddModal({ column: state.settings.defaultTrack, status: state.settings.defaultStatus });
+        openAddModal();
       }
     });
     document.getElementById("btn-export-csv").addEventListener("click", exportCSV);
@@ -1101,10 +1096,7 @@
       state.settings = {
         companyName: document.getElementById("set-company-name").value.trim(),
         hqAddress: document.getElementById("set-hq-address").value.trim(),
-        defaultTrack: document.getElementById("set-default-track").value,
-        defaultStatus: document.getElementById("set-default-status").value,
-        defaultTerms: document.getElementById("set-default-terms").value.trim(),
-        appScriptUrl: document.getElementById("set-appscript-url").value.trim()
+        defaultTerms: document.getElementById("set-default-terms").value.trim()
       };
       saveSettings();
       showToast("Workspace settings saved.");
@@ -1277,6 +1269,19 @@
       saveAndRender: () => { saveProjects(); updateClock(); renderAll(); },
       switchMainTab,
       colById
+    });
+  }
+  if (window.RGE_CLOUD_SYNC) {
+    window.RGE_CLOUD_SYNC.init({
+      getProjects: () => state.projects,
+      reloadFromStorage: () => {
+        state.projects = loadProjects();
+        state.settings = loadSettings();
+        populateSettingsForm();
+        if (window.RGE_AR_MODULE) window.RGE_AR_MODULE.init();
+        updateClock();
+        renderAll();
+      }
     });
   }
   renderAll();
