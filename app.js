@@ -8,8 +8,13 @@
 (() => {
   const { COLUMNS, STATUS_COLUMNS, INITIAL_PROJECTS } = window.RGE_TRACKER_DATA;
 
-  const STORAGE_KEY = "rge_project_tracker_v3";
+  const STORAGE_KEY = "rge_project_tracker_prod_v3";
   const SETTINGS_KEY = "rge_project_tracker_settings_v1";
+
+  // Purge legacy demo storage key once so fresh 9-project catalog loads cleanly
+  try {
+    localStorage.removeItem("rge_project_tracker_prod_v2");
+  } catch (_) {}
   const colById = Object.fromEntries(COLUMNS.map((c) => [c.id, c]));
   const statusById = Object.fromEntries(STATUS_COLUMNS.map((s) => [s.id, s]));
 
@@ -55,6 +60,7 @@
     panelStatus: document.getElementById("panel-status"),
     panelOverview: document.getElementById("panel-overview"),
     panelAwarded: document.getElementById("panel-awarded"),
+    panelSites: document.getElementById("panel-sites"),
     panelAr: document.getElementById("panel-ar"),
     panelSettings: document.getElementById("panel-settings"),
     topKpiStrip: document.querySelector("#main-workspace > .kpi-strip"),
@@ -125,7 +131,7 @@
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed)) return parsed;
       }
     } catch (_) {}
     return structuredClone(INITIAL_PROJECTS);
@@ -222,6 +228,7 @@
     renderMasterTable(filteredForTracks);
     renderTab3OverviewAndDistribution(state.projects);
     if (window.RGE_AWARDED_MODULE) window.RGE_AWARDED_MODULE.render();
+    if (window.RGE_SITES_MEDIA) window.RGE_SITES_MEDIA.render();
     syncTabAndViewUI();
   }
 
@@ -616,6 +623,7 @@
     const tab = state.activeTab;
     const isOverview = tab === "overview";
     const isAwarded = tab === "awarded";
+    const isSites = tab === "sites";
     const isAR = tab === "ar";
     const isSettings = tab === "settings";
     const isBoardTab = tab === "tracks" || tab === "status";
@@ -632,7 +640,7 @@
     });
 
     // Show/Hide KPIs, Toolbar & Panels cleanly
-    if (el.topKpiStrip) el.topKpiStrip.hidden = isAwarded || isAR || isSettings;
+    if (el.topKpiStrip) el.topKpiStrip.hidden = isAwarded || isSites || isAR || isSettings;
     el.boardListSwitcher.hidden = !isBoardTab;
     el.sharedFilterToolbar.hidden = !isBoardTab;
     el.statusFilterPills.hidden = tab === "status";
@@ -642,6 +650,7 @@
     el.masterTableSection.hidden = !isTable;
     el.panelOverview.hidden = !isOverview;
     if (el.panelAwarded) el.panelAwarded.hidden = !isAwarded;
+    if (el.panelSites) el.panelSites.hidden = !isSites;
     if (el.panelAr) el.panelAr.hidden = !isAR;
     if (el.panelSettings) el.panelSettings.hidden = !isSettings;
 
@@ -771,10 +780,13 @@
     const tasksHTML = (proj.tasks || [])
       .map(
         (t, i) => `
-      <label class="check-item ${t.done ? "is-done" : ""}">
-        <input type="checkbox" data-task-idx="${i}" ${t.done ? "checked" : ""} />
-        <span>${esc(t.text)}</span>
-      </label>`
+      <div class="check-item-row ${t.done ? "is-done" : ""}">
+        <label class="check-item-label">
+          <input type="checkbox" data-task-idx="${i}" ${t.done ? "checked" : ""} />
+          <span>${esc(t.text)}</span>
+        </label>
+        <button type="button" class="check-del-btn" data-del-task="${i}" title="Delete checklist item" aria-label="Delete ${esc(t.text)}">Delete</button>
+      </div>`
       )
       .join("");
 
@@ -813,9 +825,11 @@
         <div class="detail-label" style="margin-bottom:0.45rem">Project Metadata</div>
         <div class="detail-info-grid">
           <div><span>Client</span><strong>${esc(proj.client)}</strong></div>
-          <div><span>Project Lead / PIC</span><strong>${esc(proj.pm)}</strong></div>
-          <div><span>Site Location</span><strong>${esc(proj.location)}</strong></div>
-          <div><span>Target Completion</span><strong>${esc(proj.dueDate)}</strong></div>
+          <div><span>End User</span><strong>${esc(proj.endUser || "—")}</strong></div>
+          <div><span>Project Site</span><strong>${esc(proj.location)}</strong></div>
+          <div><span>Purchase Order Date</span><strong>${esc(proj.poDate || "—")}</strong></div>
+          <div><span>Implementation Date</span><strong>${esc(proj.implementationDate || "—")}</strong></div>
+          <div><span>Target Completion</span><strong>${esc(proj.dueDate || "—")}</strong></div>
         </div>
       </div>
 
@@ -870,12 +884,28 @@
         const idx = Number(e.target.getAttribute("data-task-idx"));
         proj.tasks[idx].done = e.target.checked;
         const doneCount = proj.tasks.filter((t) => t.done).length;
-        proj.progress = Math.round((doneCount / proj.tasks.length) * 100);
+        proj.progress = proj.tasks.length ? Math.round((doneCount / proj.tasks.length) * 100) : proj.progress;
         proj.billed = Math.round(proj.value * (proj.progress / 100));
         if (proj.progress === 100) proj.status = "Project completed";
         saveProjects();
         renderDetailContent(proj);
         renderAll();
+      });
+    });
+
+    el.detailBody.querySelectorAll("[data-del-task]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const idx = Number(btn.getAttribute("data-del-task"));
+        proj.tasks.splice(idx, 1);
+        if (proj.tasks.length > 0) {
+          const doneCount = proj.tasks.filter((t) => t.done).length;
+          proj.progress = Math.round((doneCount / proj.tasks.length) * 100);
+          proj.billed = Math.round(proj.value * (proj.progress / 100));
+        }
+        saveProjects();
+        renderDetailContent(proj);
+        renderAll();
+        showToast("Deleted checklist item.");
       });
     });
 
@@ -905,16 +935,35 @@
     state.activeProjectId = null;
   }
 
-  function deleteActiveProject() {
+  async function deleteActiveProject() {
     if (!state.activeProjectId) return;
     const proj = state.projects.find((p) => p.id === state.activeProjectId);
     if (!proj) return;
-    if (!window.confirm(`Remove "${proj.name}" (${proj.id}) from the tracker?`)) return;
+    if (!window.confirm(`Permanently delete "${proj.name}" (${proj.id}) and its stored site photos / linked AR entry from storage?`)) return;
+
+    // 1. Delete from projects list & persist immediately to localStorage
     state.projects = state.projects.filter((p) => p.id !== state.activeProjectId);
     saveProjects();
+
+    // 2. Purge project's photos from IndexedDB & Cloudflare R2 media storage
+    if (window.RGE_SITES_MEDIA && window.RGE_SITES_MEDIA.cleanupProjectMedia) {
+      await window.RGE_SITES_MEDIA.cleanupProjectMedia(proj);
+    }
+
+    // 3. Remove matching linked AR record from AR storage
+    if (window.RGE_AR_MODULE && window.RGE_AR_MODULE.deleteByProject) {
+      window.RGE_AR_MODULE.deleteByProject(proj);
+    }
+
+    // 4. Push deletion immediately to Cloudflare R2 latest.json if configured
+    if (window.RGE_CLOUD_SYNC && window.RGE_CLOUD_SYNC.pushImmediateIfEnabled) {
+      window.RGE_CLOUD_SYNC.pushImmediateIfEnabled();
+    }
+
     closeDetail();
+    updateClock();
     renderAll();
-    showToast(`Deleted ${proj.id}.`);
+    showToast(`Permanently deleted ${proj.id} from local & cloud storage.`);
   }
 
   function downloadBrief() {
@@ -971,23 +1020,31 @@
     const status = document.getElementById("f-status").value;
     const rawProg = Math.min(100, Math.max(0, Number(document.getElementById("f-progress").value)));
     const progress = status === "Project completed" ? 100 : rawProg;
-    const value = Number(document.getElementById("f-value").value);
+    const value = Number(document.getElementById("f-value").value) || 0;
+    const poDate = document.getElementById("f-podate").value;
+    const implementationDate = document.getElementById("f-impldate").value;
     const nextNum = String(state.projects.length + 1).padStart(3, "0");
 
     const newProj = {
       id: `RGE-TRK-${nextNum}`,
-      po: document.getElementById("f-po").value.trim() || `PO-2026-${4600 + state.projects.length}`,
+      po: document.getElementById("f-po").value.trim(),
+      poDate,
       name: document.getElementById("f-name").value.trim(),
       client: document.getElementById("f-client").value.trim(),
+      endUser: document.getElementById("f-enduser").value.trim(),
       column: document.getElementById("f-column").value,
       status,
       priority: document.getElementById("f-priority").value,
       location: document.getElementById("f-location").value.trim(),
-      pm: document.getElementById("f-pm").value.trim(),
+      pm: "RGE Project Team",
       value,
+      workingBudget: Math.round(value * 0.72),
       billed: Math.round(value * (progress / 100)),
       progress,
+      mobilizationDate: implementationDate,
+      implementationDate,
       dueDate: document.getElementById("f-due").value,
+      sitePhotos: [],
       notes: document.getElementById("f-notes").value.trim() || "RGE Infra & Information Technology Services engagement.",
       tasks: [
         { text: "Site survey & technical BOM sign-off", done: progress >= 20 },
@@ -1103,7 +1160,7 @@
     });
 
     document.getElementById("btn-backup-json").addEventListener("click", () => {
-      const arRaw = localStorage.getItem("rge_project_tracker_ar_v2");
+      const arRaw = localStorage.getItem("rge_project_tracker_ar_prod_v3");
       const payload = {
         exportedAt: new Date().toISOString(),
         settings: state.settings,
@@ -1126,7 +1183,7 @@
             saveProjects();
           }
           if (Array.isArray(parsed.accountReceivable)) {
-            localStorage.setItem("rge_project_tracker_ar_v2", JSON.stringify(parsed.accountReceivable));
+            localStorage.setItem("rge_project_tracker_ar_prod_v3", JSON.stringify(parsed.accountReceivable));
           }
           if (parsed.settings) {
             state.settings = { ...state.settings, ...parsed.settings };
@@ -1143,16 +1200,6 @@
       };
       reader.readAsText(file);
     });
-
-    const resetAllHandler = () => {
-      localStorage.removeItem(STORAGE_KEY);
-      state.projects = structuredClone(INITIAL_PROJECTS);
-      clearFilters();
-      updateClock();
-      if (window.RGE_AR_MODULE) window.RGE_AR_MODULE.resetDemoAR();
-      showToast("Restored default RGE Project Tracker & AR records.");
-    };
-    document.getElementById("btn-settings-reset").addEventListener("click", resetAllHandler);
 
     // Search, Status Chips, Priority & Sort
     el.inputSearch.addEventListener("input", (e) => { state.search = e.target.value; renderAll(); });
@@ -1239,16 +1286,6 @@
     el.modalBackdrop.addEventListener("click", (e) => { if (e.target === el.modalBackdrop) closeAddModal(); });
     el.formAddProject.addEventListener("submit", handleAddSubmit);
 
-    // Reset Demo Data
-    document.getElementById("btn-reset-demo").addEventListener("click", () => {
-      localStorage.removeItem(STORAGE_KEY);
-      state.projects = structuredClone(INITIAL_PROJECTS);
-      clearFilters();
-      updateClock();
-      if (window.RGE_AR_MODULE) window.RGE_AR_MODULE.resetDemoAR();
-      showToast("Restored default RGE Project Tracker & AR records.");
-    });
-
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
         if (el.modalBackdrop.classList.contains("is-open")) closeAddModal();
@@ -1256,6 +1293,97 @@
         if (el.leftSidebar?.classList.contains("is-open")) closeMobileSidebar();
       }
     });
+
+    initHorizontalButtonSliders();
+  }
+
+  /* ========================================================================
+     HORIZONTAL TAP-HOLD-SLIDE CONTROLLER FOR MOBILE BUTTON STRIPS
+     Supports touch swipe AND pointer tap-hold-drag to slide horizontal buttons
+     ======================================================================== */
+  function initHorizontalButtonSliders() {
+    const SLIDE_SELECTOR = [
+      ".command-actions",
+      ".mobile-bottom-bar",
+      ".status-pills",
+      ".mobile-column-tabs",
+      ".column-filter-mini",
+      ".ar-pb-toggle",
+      ".ar-pb-tabs",
+      ".site-phase-tabs",
+      ".settings-sublist",
+      ".toolbar-right",
+      ".site-loc-btns",
+      ".site-upload-actions",
+      ".site-card-actions",
+      ".site-contact-actions",
+      ".detail-footer",
+      ".modal-footer",
+      ".ar-row-actions"
+    ].join(", ");
+
+    let activeStrip = null;
+    let startX = 0;
+    let startScrollLeft = 0;
+    let dragged = false;
+    let suppressNextClick = false;
+    let activePointerId = null;
+
+    document.addEventListener("pointerdown", (e) => {
+      // On real touch devices, native overflow-x momentum scrolling handles tap-hold-slide natively
+      if (e.pointerType === "touch") return;
+      if (e.pointerType === "mouse" && e.button !== 0) return;
+      if (e.target.closest("select, input, textarea")) return;
+      const strip = e.target.closest(SLIDE_SELECTOR);
+      if (!strip || strip.scrollWidth <= strip.clientWidth + 2) return;
+
+      activeStrip = strip;
+      activePointerId = e.pointerId;
+      startX = e.clientX;
+      startScrollLeft = strip.scrollLeft;
+      dragged = false;
+    });
+
+    document.addEventListener("pointermove", (e) => {
+      if (!activeStrip || e.pointerId !== activePointerId) return;
+      const dx = e.clientX - startX;
+      if (!dragged && Math.abs(dx) > 6) {
+        dragged = true;
+        activeStrip.classList.add("is-h-sliding");
+      }
+      if (dragged) {
+        activeStrip.scrollLeft = startScrollLeft - dx;
+      }
+    }, { passive: true });
+
+    const endSlide = (e) => {
+      if (!activeStrip || (e.pointerId !== undefined && e.pointerId !== activePointerId)) return;
+      if (dragged) {
+        suppressNextClick = true;
+        setTimeout(() => { suppressNextClick = false; }, 120);
+      }
+      activeStrip.classList.remove("is-h-sliding");
+      activeStrip = null;
+      activePointerId = null;
+      dragged = false;
+    };
+
+    document.addEventListener("pointerup", endSlide);
+    document.addEventListener("pointercancel", endSlide);
+
+    // Prevent accidental button tap immediately after sliding
+    document.addEventListener("click", (e) => {
+      if (suppressNextClick) {
+        e.preventDefault();
+        e.stopPropagation();
+        suppressNextClick = false;
+        return;
+      }
+      const btn = e.target.closest(`${SLIDE_SELECTOR} > *`);
+      if (btn && window.innerWidth <= 767) {
+        btn.scrollIntoView({ behavior: "smooth", inline: "nearest", block: "nearest" });
+      }
+    }, true);
   }
 
   updateClock();
@@ -1268,6 +1396,13 @@
       getProjects: () => state.projects,
       saveAndRender: () => { saveProjects(); updateClock(); renderAll(); },
       switchMainTab,
+      colById
+    });
+  }
+  if (window.RGE_SITES_MEDIA) {
+    window.RGE_SITES_MEDIA.init({
+      getProjects: () => state.projects,
+      saveAndRender: () => { saveProjects(); updateClock(); renderAll(); },
       colById
     });
   }

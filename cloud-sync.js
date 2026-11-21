@@ -10,8 +10,8 @@
 window.RGE_CLOUD_SYNC = (() => {
   const CFG_KEY = "rge_cloud_r2_config_v1";
   const LOCAL_SNAPS_KEY = "rge_cloud_local_snapshots_v1";
-  const PROJECTS_KEY = "rge_project_tracker_v3";
-  const AR_KEY = "rge_project_tracker_ar_v2";
+  const PROJECTS_KEY = "rge_project_tracker_prod_v3";
+  const AR_KEY = "rge_project_tracker_ar_prod_v3";
   const SETTINGS_KEY = "rge_project_tracker_settings_v1";
 
   let autoBackupTimer = null;
@@ -460,6 +460,14 @@ window.RGE_CLOUD_SYNC = (() => {
     }, 3500);
   }
 
+  /* Push deletions immediately to Cloudflare R2 so deleted items never reappear on sync */
+  function pushImmediateIfEnabled() {
+    clearTimeout(autoBackupTimer);
+    if (isCloudConfigured() && cfg.autoBackup) {
+      backupNow(true);
+    }
+  }
+
   /* ========================================================================
      PHONE / MULTI-DEVICE PAIRING (Hash Link + Scannable Pairing Code)
      ======================================================================== */
@@ -704,5 +712,5 @@ window.RGE_CLOUD_SYNC = (() => {
     renderCloudUI();
   }
 
-  return { init, renderCloudUI, scheduleAutoBackup, backupNow, syncNow };
+  return { init, renderCloudUI, scheduleAutoBackup, pushImmediateIfEnabled, backupNow, syncNow };
 })();

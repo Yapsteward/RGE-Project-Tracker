@@ -11,8 +11,87 @@
    ========================================================================== */
 
 window.RGE_AR_MODULE = (() => {
-  const AR_STORAGE_KEY = "rge_project_tracker_ar_v2";
+  const AR_STORAGE_KEY = "rge_project_tracker_ar_prod_v3";
+  const PROJECTS_STORAGE_KEY = "rge_project_tracker_prod_v3";
   const PB_COUNT = 10;
+
+  // Purge legacy demo storage keys once on migration
+  try {
+    localStorage.removeItem("rge_project_tracker_ar_prod_v2");
+  } catch (_) {}
+
+  /* Live reader for all stored projects (previous + newly added via + New Project) */
+  function getStoredProjectsCatalog() {
+    let storedProjects = [];
+    try {
+      const raw = localStorage.getItem(PROJECTS_STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) storedProjects = parsed;
+      } else if (window.RGE_TRACKER_DATA?.INITIAL_PROJECTS) {
+        storedProjects = window.RGE_TRACKER_DATA.INITIAL_PROJECTS;
+      }
+    } catch (_) {}
+
+    const seen = new Set();
+    const catalog = [];
+
+    const hasExistingAR = (title, po) => {
+      const tLow = (title || "").trim().toLowerCase();
+      const pLow = (po || "").trim().toLowerCase();
+      return arState.records.some(
+        (r) =>
+          (pLow && (r.poNo || "").trim().toLowerCase() === pLow) ||
+          (tLow && (r.projectTitle || "").trim().toLowerCase() === tLow)
+      );
+    };
+
+    // 1. Live projects from main tracker storage (newest added appear first!)
+    storedProjects.forEach((p) => {
+      const title = (p.name || "").trim();
+      if (!title) return;
+      const key = `${title.toLowerCase()}|${(p.po || "").trim().toLowerCase()}`;
+      if (seen.has(key)) return;
+      seen.add(key);
+      catalog.push({
+        source: "project",
+        projectId: p.id || "",
+        projectTitle: title,
+        client: p.client || "",
+        endUser: p.endUser || "",
+        projectSite: p.location || "",
+        poNo: p.po || "",
+        poAmount: Number(p.value) || 0,
+        poDate: p.poDate || "",
+        tpcCost: Number(p.workingBudget) || 0,
+        hasAR: hasExistingAR(title, p.po)
+      });
+    });
+
+    // 2. Also include any previous AR-only projects not already in the main tracker
+    arState.records.forEach((r) => {
+      const title = (r.projectTitle || "").trim();
+      if (!title) return;
+      const key = `${title.toLowerCase()}|${(r.poNo || "").trim().toLowerCase()}`;
+      if (seen.has(key)) return;
+      seen.add(key);
+      catalog.push({
+        source: "ar",
+        projectId: r.id || "",
+        projectTitle: title,
+        client: r.client || "",
+        endUser: r.endUser || "",
+        projectSite: r.projectSite || "",
+        poNo: r.poNo || "",
+        poAmount: Number(r.poAmount) || 0,
+        poDate: r.poDate || "",
+        tpcCost: Number(r.tpcCost) || 0,
+        hasAR: true
+      });
+    });
+
+    return catalog;
+  }
 
   function makeEmptyPBs(prefill = {}) {
     const pbs = [];
@@ -29,85 +108,155 @@ window.RGE_AR_MODULE = (() => {
     return pbs;
   }
 
-  /* 5 Clean Sample AR Records matching the 5 sample projects */
+  /* 9 Sample AR Records aligned 1-to-1 with the 9 Core RGE Projects */
   const INITIAL_AR_RECORDS = [
     {
       id: "AR-2026-001",
-      projectTitle: "Supply & installation of CCTV Cameras (24units)",
-      client: "ABC Company",
-      endUser: "Jaguar",
-      projectSite: "Makati",
-      poNo: "PO-2026-1001",
-      poAmount: 100000,
-      poDate: "2026-11-21",
-      dpAmount: 50000,
-      dpDate: "2026-11-22",
-      dpSiNo: "SI-2026-0412",
-      dpSiDate: "2026-11-22",
+      projectTitle: "Fiber Infrastructure",
+      client: "MetroLuzon Broadband Corp.",
+      endUser: "QC Central Distribution Node",
+      projectSite: "Kamuning Road to EDSA, Quezon City",
+      poNo: "PO-2026-2001",
+      poAmount: 4850000,
+      poDate: "2026-09-12",
+      dpAmount: 1940000,
+      dpDate: "2026-09-16",
+      dpSiNo: "SI-2026-1001",
+      dpSiDate: "2026-09-15",
       pbs: makeEmptyPBs({
-        1: { amount: 20000, date: "2026-11-28", siNo: "SI-2026-0438", siDate: "2026-11-28" }
+        1: { amount: 1212500, date: "2026-10-28", siNo: "SI-2026-1042", siDate: "2026-10-25" }
       }),
       finalAmount: 0,
       finalDate: "",
       finalSiNo: "",
       finalSiDate: "",
-      ewt2307: 700,
-      terms: "50% DP, 40% Progress Billing, 10% Completion",
-      tpcCost: 68500
+      ewt2307: 48500,
+      terms: "40% DP, 50% Progress Billing, 10% Completion",
+      tpcCost: 3420000
     },
     {
       id: "AR-2026-002",
-      projectTitle: "QC District 4 144-Core ADSS Fiber Drums & Closures",
-      client: "Quezon City Engineering Office",
-      endUser: "QC IT Development Office",
-      projectSite: "Kamuning, Quezon City",
-      poNo: "PO-2026-4410",
-      poAmount: 14800000,
-      poDate: "2026-10-15",
-      dpAmount: 7400000,
-      dpDate: "2026-10-22",
-      dpSiNo: "SI-2026-0290",
-      dpSiDate: "2026-10-20",
+      projectTitle: "Structured Cabling",
+      client: "Ayala Enterprise Holdings Inc.",
+      endUser: "Makati Corporate HQ (Floors 14–16)",
+      projectSite: "Ayala Avenue, Makati CBD",
+      poNo: "PO-2026-2002",
+      poAmount: 1650000,
+      poDate: "2026-10-02",
+      dpAmount: 825000,
+      dpDate: "2026-10-06",
+      dpSiNo: "SI-2026-1015",
+      dpSiDate: "2026-10-05",
+      pbs: makeEmptyPBs({
+        1: { amount: 412500, date: "2026-11-10", siNo: "SI-2026-1068", siDate: "2026-11-08" }
+      }),
+      finalAmount: 0,
+      finalDate: "",
+      finalSiNo: "",
+      finalSiDate: "",
+      ewt2307: 16500,
+      terms: "50% DP, 40% Progress Billing, 10% Completion",
+      tpcCost: 1180000
+    },
+    {
+      id: "AR-2026-003",
+      projectTitle: "Network Solutions",
+      client: "BGC Financial Towers Corp.",
+      endUser: "One High Street Corporate Hub",
+      projectSite: "Bonifacio Global City, Taguig",
+      poNo: "PO-2026-2003",
+      poAmount: 2400000,
+      poDate: "2026-11-03",
+      dpAmount: 1200000,
+      dpDate: "2026-11-09",
+      dpSiNo: "SI-2026-1074",
+      dpSiDate: "2026-11-07",
       pbs: makeEmptyPBs(),
       finalAmount: 0,
       finalDate: "",
       finalSiNo: "",
       finalSiDate: "",
-      ewt2307: 74000,
-      terms: "50% DP, 25% Batch 1 Delivery, 25% Final Delivery",
-      tpcCost: 10900000
-    },
-    {
-      id: "AR-2026-003",
-      projectTitle: "Cat6A Shielded Boxes, Patch Panels & OM4 Trunks",
-      client: "MetroPrime Financial Holdings",
-      endUser: "MetroPrime BGC Tower",
-      projectSite: "BGC, Taguig City",
-      poNo: "PO-2026-4302",
-      poAmount: 6850000,
-      poDate: "2026-07-01",
-      dpAmount: 3425000,
-      dpDate: "2026-07-10",
-      dpSiNo: "SI-2026-0251",
-      dpSiDate: "2026-07-08",
-      pbs: makeEmptyPBs(),
-      finalAmount: 3356500,
-      finalDate: "2026-11-05",
-      finalSiNo: "SI-2026-0392",
-      finalSiDate: "2026-11-04",
-      ewt2307: 68500,
-      terms: "50% DP, 50% Upon Full Warehouse Release",
-      tpcCost: 5120000
+      ewt2307: 12000,
+      terms: "50% DP, 50% Upon Full Hardware Delivery",
+      tpcCost: 1750000
     },
     {
       id: "AR-2026-004",
-      projectTitle: "Clark Data Center Zero-Downtime Rack Migration",
-      client: "Luzon Cloud Colocation Inc.",
-      endUser: "Luzon Cloud Operations",
-      projectSite: "Clark Global City, Pampanga",
-      poNo: "PO-2026-4542",
-      poAmount: 11600000,
-      poDate: "2026-11-12",
+      projectTitle: "Network Security",
+      client: "Pacific Trust Savings Bank",
+      endUser: "Ortigas Main Banking Center",
+      projectSite: "Ortigas Center, Pasig City",
+      poNo: "PO-2026-2004",
+      poAmount: 1950000,
+      poDate: "2026-07-15",
+      dpAmount: 975000,
+      dpDate: "2026-07-20",
+      dpSiNo: "SI-2026-0912",
+      dpSiDate: "2026-07-18",
+      pbs: makeEmptyPBs(),
+      finalAmount: 955500,
+      finalDate: "2026-10-14",
+      finalSiNo: "SI-2026-1028",
+      finalSiDate: "2026-10-12",
+      ewt2307: 19500,
+      terms: "50% DP, 50% Upon License Activation & Delivery",
+      tpcCost: 1420000
+    },
+    {
+      id: "AR-2026-005",
+      projectTitle: "Civil & Telecom Works",
+      client: "NorthGrid Telco Ventures",
+      endUser: "Commonwealth Backbone Ductway",
+      projectSite: "Commonwealth Avenue, Quezon City",
+      poNo: "PO-2026-2005",
+      poAmount: 6200000,
+      poDate: "2026-08-20",
+      dpAmount: 1860000,
+      dpDate: "2026-08-26",
+      dpSiNo: "SI-2026-0960",
+      dpSiDate: "2026-08-24",
+      pbs: makeEmptyPBs({
+        1: { amount: 620000, date: "2026-10-05", siNo: "SI-2026-1019", siDate: "2026-10-03" }
+      }),
+      finalAmount: 0,
+      finalDate: "",
+      finalSiNo: "",
+      finalSiDate: "",
+      ewt2307: 49600,
+      terms: "30% DP, 60% Progress Billing, 10% Retention",
+      tpcCost: 4480000
+    },
+    {
+      id: "AR-2026-006",
+      projectTitle: "Audio Visual (AV) Systems",
+      client: "SouthPoint Commercial Group",
+      endUser: "Alabang Executive Boardroom & Auditorium",
+      projectSite: "Filinvest City, Alabang, Muntinlupa",
+      poNo: "PO-2026-2006",
+      poAmount: 1280000,
+      poDate: "2026-11-08",
+      dpAmount: 640000,
+      dpDate: "2026-11-14",
+      dpSiNo: "SI-2026-1081",
+      dpSiDate: "2026-11-12",
+      pbs: makeEmptyPBs(),
+      finalAmount: 0,
+      finalDate: "",
+      finalSiNo: "",
+      finalSiDate: "",
+      ewt2307: 12800,
+      terms: "50% DP, 40% Delivery & Installation, 10% Sign-off",
+      tpcCost: 910000
+    },
+    {
+      id: "AR-2026-007",
+      projectTitle: "Data Center & Server Rooms",
+      client: "Laguna Precision Manufacturing Inc.",
+      endUser: "Technopark Tier-2 Server Room",
+      projectSite: "Laguna Technopark, Santa Rosa, Laguna",
+      poNo: "PO-2026-2007",
+      poAmount: 8500000,
+      poDate: "2026-11-18",
       dpAmount: 0,
       dpDate: "",
       dpSiNo: "",
@@ -118,32 +267,57 @@ window.RGE_AR_MODULE = (() => {
       finalSiNo: "",
       finalSiDate: "",
       ewt2307: 0,
-      terms: "30% DP, 50% Cutover Completion, 20% UAT Sign-off",
-      tpcCost: 8100000
+      terms: "40% DP, 50% Progress Billing, 10% Commissioning",
+      tpcCost: 6150000
     },
     {
-      id: "AR-2026-005",
-      projectTitle: "Mindanao Agro-Hub Telecom Towers & Solar Shelters",
-      client: "Mindanao Shared Tower Co.",
-      endUser: "Regional Carrier Consortium",
-      projectSite: "Davao del Norte",
-      poNo: "PO-2026-4288",
-      poAmount: 31200000,
-      poDate: "2026-06-20",
-      dpAmount: 6240000,
-      dpDate: "2026-07-02",
-      dpSiNo: "SI-2026-0225",
-      dpSiDate: "2026-07-01",
+      id: "AR-2026-008",
+      projectTitle: "CCTV & Access Control",
+      client: "Visayas Logistics & Cold Storage Corp.",
+      endUser: "Cebu IT Park Operations & Warehouse",
+      projectSite: "Cebu IT Park, Cebu City",
+      poNo: "PO-2026-2008",
+      poAmount: 980000,
+      poDate: "2026-08-04",
+      dpAmount: 490000,
+      dpDate: "2026-08-08",
+      dpSiNo: "SI-2026-0944",
+      dpSiDate: "2026-08-07",
       pbs: makeEmptyPBs({
-        1: { amount: 4680000, date: "2026-09-14", siNo: "SI-2026-0310", siDate: "2026-09-12" }
+        1: { amount: 294000, date: "2026-09-20", siNo: "SI-2026-0998", siDate: "2026-09-18" }
+      }),
+      finalAmount: 186200,
+      finalDate: "2026-10-29",
+      finalSiNo: "SI-2026-1055",
+      finalSiDate: "2026-10-27",
+      ewt2307: 9800,
+      terms: "50% DP, 30% Rough-in & Mounting, 20% COC",
+      tpcCost: 685000
+    },
+    {
+      id: "AR-2026-009",
+      projectTitle: "Managed IT & Maintenance",
+      client: "Clark AeroHub Business Park",
+      endUser: "Clark Freeport Zone Shared Campus",
+      projectSite: "Clark Freeport Zone, Pampanga",
+      poNo: "PO-2026-2009",
+      poAmount: 720000,
+      poDate: "2026-06-01",
+      dpAmount: 180000,
+      dpDate: "2026-06-10",
+      dpSiNo: "SI-2026-0840",
+      dpSiDate: "2026-06-08",
+      pbs: makeEmptyPBs({
+        1: { amount: 180000, date: "2026-08-12", siNo: "SI-2026-0952", siDate: "2026-08-10" },
+        2: { amount: 180000, date: "2026-10-12", siNo: "SI-2026-1031", siDate: "2026-10-10" }
       }),
       finalAmount: 0,
       finalDate: "",
       finalSiNo: "",
       finalSiDate: "",
-      ewt2307: 109200,
-      terms: "20% DP, 70% Site Progress Billing, 10% Retention",
-      tpcCost: 22400000
+      ewt2307: 10800,
+      terms: "Quarterly SLA Billing (4 Equal Installments)",
+      tpcCost: 485000
     }
   ];
 
@@ -218,7 +392,7 @@ window.RGE_AR_MODULE = (() => {
       const saved = localStorage.getItem(AR_STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
+        if (Array.isArray(parsed)) {
           return parsed.map((r) => ({
             ...r,
             pbs: Array.isArray(r.pbs) && r.pbs.length === PB_COUNT ? r.pbs : makeEmptyPBs()
@@ -305,8 +479,17 @@ window.RGE_AR_MODULE = (() => {
       drawerCode: document.getElementById("ar-drawer-code"),
       drawerBody: document.getElementById("ar-drawer-body"),
       btnCloseDrawer: document.getElementById("ar-btn-close-drawer"),
+      btnPrintDrawer: document.getElementById("ar-btn-print-drawer"),
       btnSaveDrawer: document.getElementById("ar-btn-save-drawer"),
-      btnDeleteDrawer: document.getElementById("ar-btn-delete-drawer")
+      btnDeleteDrawer: document.getElementById("ar-btn-delete-drawer"),
+      // View Statement Modal
+      viewBackdrop: document.getElementById("ar-view-modal-backdrop"),
+      viewCode: document.getElementById("ar-view-modal-code"),
+      viewTitle: document.getElementById("ar-view-modal-title"),
+      viewBody: document.getElementById("ar-view-modal-body"),
+      btnCloseView: document.getElementById("ar-view-btn-close"),
+      btnEditFromView: document.getElementById("ar-view-btn-edit"),
+      btnPrintFromView: document.getElementById("ar-view-btn-print")
     };
   }
 
@@ -370,10 +553,10 @@ window.RGE_AR_MODULE = (() => {
       pbHeadersTop += `<th colspan="5" class="ar-grp-pb">Progress Billing ${i} (PB${i})</th>`;
       pbHeadersSub += `
         <th class="ar-sub-pb text-right">PB${i} Amt</th>
-        <th class="ar-sub-pb text-right">% of PO</th>
+        <th class="ar-sub-pb text-right">% of Purchase Order</th>
         <th class="ar-sub-pb">PB${i} Date</th>
-        <th class="ar-sub-pb">SI #</th>
-        <th class="ar-sub-pb">SI Date</th>`;
+        <th class="ar-sub-pb">Sales Invoice #</th>
+        <th class="ar-sub-pb">Sales Invoice Date</th>`;
     }
 
     const theadHTML = `
@@ -384,15 +567,16 @@ window.RGE_AR_MODULE = (() => {
           ${pbHeadersTop}
           <th colspan="5" class="ar-grp-final">Final Payment</th>
           <th colspan="7" class="ar-grp-summary">Receivables, 2307 Tax &amp; Cost Summary</th>
+          <th class="ar-grp-actions ar-sticky-right">Record</th>
         </tr>
         <tr class="ar-col-row">
           <th class="ar-sub-navy ar-sticky-1">Project Title</th>
           <th class="ar-sub-navy ar-sticky-2">Client</th>
           <th class="ar-sub-navy">End User</th>
           <th class="ar-sub-navy">Project Site</th>
-          <th class="ar-sub-navy">P.O#</th>
-          <th class="ar-sub-navy text-right">P.O Amount</th>
-          <th class="ar-sub-navy">P.O Date</th>
+          <th class="ar-sub-navy">Purchase Order No.</th>
+          <th class="ar-sub-navy text-right">Purchase Order Amount</th>
+          <th class="ar-sub-navy">Purchase Order Date</th>
 
           <th class="ar-sub-dp text-right">Down Payment</th>
           <th class="ar-sub-dp text-right">% of DP</th>
@@ -415,6 +599,7 @@ window.RGE_AR_MODULE = (() => {
           <th class="ar-sub-cyan text-right">Account Receivable</th>
           <th class="ar-sub-white">Terms</th>
           <th class="ar-sub-white text-right">TPC Cost</th>
+          <th class="ar-sub-actions ar-sticky-right">View / Print</th>
         </tr>
       </thead>`;
 
@@ -467,6 +652,12 @@ window.RGE_AR_MODULE = (() => {
             <td class="text-right mono strong-ar">${fmtMoney(m.arBalance)}</td>
             <td class="ar-terms-cell">${esc(r.terms || "—")}</td>
             <td class="text-right mono">${m.tpc ? fmtMoney(m.tpc) : "—"}</td>
+            <td class="ar-sticky-right ar-actions-cell">
+              <div class="ar-row-actions">
+                <button type="button" class="ar-row-btn ar-btn-view" data-ar-view="${esc(r.id)}" title="View full AR statement">View</button>
+                <button type="button" class="ar-row-btn ar-btn-print" data-ar-print="${esc(r.id)}" title="Print AR statement">Print</button>
+              </div>
+            </td>
           </tr>`;
       })
       .join("");
@@ -488,7 +679,7 @@ window.RGE_AR_MODULE = (() => {
             <p class="ar-mob-sub"><strong>${esc(r.client)}</strong>${r.endUser ? ` &bull; End User: ${esc(r.endUser)}` : ""} &bull; ${esc(r.projectSite)}</p>
 
             <div class="ar-mob-metrics">
-              <div><span>P.O Amount</span><strong>${fmtMoney(m.po, true)}</strong></div>
+              <div><span>Purchase Order Amount</span><strong>${fmtMoney(m.po, true)}</strong></div>
               <div><span>Received</span><strong>${fmtMoney(m.totalReceived, true)}</strong></div>
               <div><span>Receivable</span><strong class="strong-ar">${fmtMoney(m.arBalance, true)}</strong></div>
             </div>
@@ -503,7 +694,10 @@ window.RGE_AR_MODULE = (() => {
 
             <div class="ar-mob-footer">
               <span>${esc(r.terms || "Standard Terms")}</span>
-              <span class="ar-edit-hint">Edit AR &rarr;</span>
+              <div class="ar-row-actions">
+                <button type="button" class="ar-row-btn ar-btn-view" data-ar-view="${esc(r.id)}">View</button>
+                <button type="button" class="ar-row-btn ar-btn-print" data-ar-print="${esc(r.id)}">Print</button>
+              </div>
             </div>
           </article>`;
       })
@@ -595,36 +789,47 @@ window.RGE_AR_MODULE = (() => {
         </div>
       </div>
 
-      <!-- GROUP 1: PROJECT & P.O INFO (DEEP NAVY) -->
+      <!-- GROUP 1: PROJECT & PURCHASE ORDER INFO (DEEP NAVY) -->
       <div class="ar-form-section sec-navy">
-        <h3>1. Project &amp; P.O Details</h3>
+        <div class="ar-sec-head">
+          <h3>1. Project &amp; Purchase Order Details</h3>
+          <span class="ar-auto-chip">${getStoredProjectsCatalog().length} Stored Project${getStoredProjectsCatalog().length === 1 ? "" : "s"}</span>
+        </div>
         <div class="ar-form-grid">
           <div class="form-field full-span">
-            <label for="ar-f-title">Project Title *</label>
-            <input type="text" id="ar-f-title" value="${esc(d.projectTitle)}" placeholder="e.g., Supply &amp; installation of CCTV Cameras (24units)" />
+            <label for="ar-f-title">Project Title * <span style="font-weight:500;color:var(--text-muted)">(Click to select project &amp; auto-fill details)</span></label>
+            <div class="ar-proj-picker-wrap" id="ar-proj-picker-wrap">
+              <div class="ar-proj-input-row">
+                <input type="text" id="ar-f-title" autocomplete="off" value="${esc(d.projectTitle)}" placeholder="Click to choose from stored &amp; newly added projects..." />
+                <button type="button" class="ar-proj-toggle-btn" id="ar-btn-toggle-proj-list" title="Show stored projects list" aria-label="Show stored projects list">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+              </div>
+              <div class="ar-proj-dropdown" id="ar-proj-dropdown" role="listbox" hidden></div>
+            </div>
           </div>
           <div class="form-field">
             <label for="ar-f-client">Client *</label>
             <input type="text" id="ar-f-client" value="${esc(d.client)}" placeholder="e.g., ABC Company" />
           </div>
           <div class="form-field">
-            <label for="ar-f-enduser">End User</label>
-            <input type="text" id="ar-f-enduser" value="${esc(d.endUser)}" placeholder="e.g., Jaquar" />
+            <label for="ar-f-enduser">End User *</label>
+            <input type="text" id="ar-f-enduser" value="${esc(d.endUser)}" placeholder="e.g., Jaguar" />
           </div>
           <div class="form-field">
-            <label for="ar-f-site">Project Site</label>
-            <input type="text" id="ar-f-site" value="${esc(d.projectSite)}" placeholder="e.g., Makati" />
+            <label for="ar-f-site">Project Site *</label>
+            <input type="text" id="ar-f-site" value="${esc(d.projectSite)}" placeholder="e.g., Makati CBD, Metro Manila" />
           </div>
           <div class="form-field">
-            <label for="ar-f-pono">P.O#</label>
+            <label for="ar-f-pono">Purchase Order No. *</label>
             <input type="text" id="ar-f-pono" value="${esc(d.poNo)}" placeholder="e.g., PO-2026-1001" />
           </div>
           <div class="form-field">
-            <label for="ar-f-poamt">P.O Amount (&#8369;)</label>
+            <label for="ar-f-poamt">Purchase Order Amount (&#8369;) *</label>
             <input type="number" id="ar-f-poamt" step="0.01" min="0" value="${d.poAmount || ""}" placeholder="100000.00" />
           </div>
           <div class="form-field">
-            <label for="ar-f-podate">P.O Date</label>
+            <label for="ar-f-podate">Purchase Order Date *</label>
             <input type="date" id="ar-f-podate" value="${esc(d.poDate)}" />
           </div>
         </div>
@@ -795,6 +1000,105 @@ window.RGE_AR_MODULE = (() => {
       inp.addEventListener("input", refreshDrawerLiveNumbers);
     });
 
+    // Interactive Stored Projects Picker on Project Title click / focus / type
+    const titleInput = document.getElementById("ar-f-title");
+    const dropdown = document.getElementById("ar-proj-dropdown");
+    const toggleBtn = document.getElementById("ar-btn-toggle-proj-list");
+    const pickerWrap = document.getElementById("ar-proj-picker-wrap");
+
+    const renderProjectDropdown = (filterText = "") => {
+      const catalog = getStoredProjectsCatalog();
+      const q = filterText.trim().toLowerCase();
+      const matches = q
+        ? catalog.filter((p) => {
+            const hay = `${p.projectId} ${p.projectTitle} ${p.client} ${p.endUser} ${p.projectSite} ${p.poNo}`.toLowerCase();
+            return hay.includes(q);
+          })
+        : catalog;
+
+      if (!matches.length) {
+        dropdown.innerHTML = `<div class="ar-proj-empty">${
+          catalog.length
+            ? "No stored project matches your search — you may keep typing a custom Project Title."
+            : "No projects saved yet. Add one via + New Project or type a Project Title manually."
+        }</div>`;
+      } else {
+        dropdown.innerHTML = matches
+          .map(
+            (p, idx) => `
+              <button type="button" class="ar-proj-option" role="option" data-proj-idx="${idx}">
+                <div class="ar-proj-opt-top">
+                  <strong>${esc(p.projectTitle)}</strong>
+                  <span class="ar-proj-opt-badge ${p.hasAR ? "is-linked" : "is-new"}">${p.hasAR ? "Saved Project" : "New • Auto-Fill"}</span>
+                </div>
+                <div class="ar-proj-opt-meta">
+                  <span>${esc(p.client || "No Client")}${p.endUser ? ` &bull; ${esc(p.endUser)}` : ""}</span>
+                  <span class="mono">${esc(p.poNo || "No Purchase Order")} &bull; ${fmtMoney(p.poAmount, true)}</span>
+                </div>
+                ${p.projectSite ? `<div class="ar-proj-opt-site">${esc(p.projectSite)}${p.poDate ? ` &bull; Purchase Order Date: ${esc(p.poDate)}` : ""}</div>` : ""}
+              </button>`
+          )
+          .join("");
+      }
+
+      dropdown._matches = matches;
+      dropdown.hidden = false;
+    };
+
+    const closeDropdown = () => {
+      if (dropdown) dropdown.hidden = true;
+    };
+
+    if (titleInput && dropdown) {
+      titleInput.addEventListener("focus", () => renderProjectDropdown(""));
+      titleInput.addEventListener("click", () => renderProjectDropdown(""));
+      titleInput.addEventListener("input", (e) => renderProjectDropdown(e.target.value));
+
+      if (toggleBtn) {
+        toggleBtn.addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (dropdown.hidden) {
+            renderProjectDropdown("");
+            titleInput.focus();
+          } else {
+            closeDropdown();
+          }
+        });
+      }
+
+      dropdown.addEventListener("click", (e) => {
+        const opt = e.target.closest("[data-proj-idx]");
+        if (!opt) return;
+        const idx = Number(opt.getAttribute("data-proj-idx"));
+        const picked = (dropdown._matches || [])[idx];
+        if (!picked) return;
+
+        document.getElementById("ar-f-title").value = picked.projectTitle || "";
+        document.getElementById("ar-f-client").value = picked.client || "";
+        document.getElementById("ar-f-enduser").value = picked.endUser || "";
+        document.getElementById("ar-f-site").value = picked.projectSite || "";
+        document.getElementById("ar-f-pono").value = picked.poNo || "";
+        document.getElementById("ar-f-poamt").value = picked.poAmount || "";
+        if (picked.poDate) document.getElementById("ar-f-podate").value = picked.poDate;
+        const tpcInput = document.getElementById("ar-f-tpc");
+        if (tpcInput && (!tpcInput.value || Number(tpcInput.value) === 0) && picked.tpcCost > 0) {
+          tpcInput.value = picked.tpcCost;
+        }
+
+        if (!arState.editingId) {
+          dom.drawerTitle.textContent = picked.projectTitle || "Create Account Receivable Record";
+        }
+        refreshDrawerLiveNumbers();
+        closeDropdown();
+        toast(`Auto-filled Purchase Order details from "${picked.projectTitle}".`);
+      });
+
+      dom.drawerBody.addEventListener("mousedown", (e) => {
+        if (pickerWrap && !pickerWrap.contains(e.target)) closeDropdown();
+      });
+    }
+
     // Switch between PB1..PB10 tabs inside drawer without losing typed values
     dom.drawerBody.querySelector("#ar-pb-tabs").addEventListener("click", (e) => {
       const btn = e.target.closest("[data-pb-tab]");
@@ -827,8 +1131,17 @@ window.RGE_AR_MODULE = (() => {
   function saveARDrawer() {
     syncDraftFromInputs();
     const d = arState.draft;
-    if (!d.projectTitle.trim() || !d.client.trim()) {
-      toast("Please enter both Project Title and Client.");
+    const missing = [];
+    if (!d.projectTitle.trim()) missing.push("Project Title");
+    if (!d.client.trim()) missing.push("Client");
+    if (!d.endUser.trim()) missing.push("End User");
+    if (!d.projectSite.trim()) missing.push("Project Site");
+    if (!d.poNo.trim()) missing.push("Purchase Order No.");
+    if (!(Number(d.poAmount) > 0)) missing.push("Purchase Order Amount");
+    if (!d.poDate.trim()) missing.push("Purchase Order Date");
+
+    if (missing.length) {
+      toast(`Please fill required field${missing.length > 1 ? "s" : ""}: ${missing.join(", ")}.`);
       return;
     }
 
@@ -855,7 +1168,8 @@ window.RGE_AR_MODULE = (() => {
     saveAR();
     closeARDrawer();
     renderAR();
-    toast(`Deleted AR record ${rec.id}.`);
+    if (window.RGE_CLOUD_SYNC) window.RGE_CLOUD_SYNC.pushImmediateIfEnabled();
+    toast(`Permanently deleted AR record ${rec.id} from storage.`);
   }
 
   function closeARDrawer() {
@@ -873,7 +1187,7 @@ window.RGE_AR_MODULE = (() => {
   function exportARCSV() {
     const rows = getFilteredAR();
     const headers = [
-      "Project Title", "Client", "End User", "Project Site", "P.O#", "P.O Amount", "P.O Date",
+      "Project Title", "Client", "End User", "Project Site", "Purchase Order No.", "Purchase Order Amount", "Purchase Order Date",
       "Down Payment", "% of DP", "DP Date", "DP Sales Invoice #", "DP Sales Invoice Date"
     ];
     for (let i = 1; i <= PB_COUNT; i++) {
@@ -967,13 +1281,144 @@ window.RGE_AR_MODULE = (() => {
     toast(`Created & synced AR record ${newAR.id} from "${proj.po || proj.id}".`);
   }
 
-  function resetDemoAR() {
-    localStorage.removeItem(AR_STORAGE_KEY);
-    arState.records = structuredClone(INITIAL_AR_RECORDS);
-    arState.search = "";
-    arState.remarksFilter = "all";
-    if (dom.searchInput) dom.searchInput.value = "";
-    renderAR();
+  /* ========================================================================
+     SINGLE-ROW VIEW STATEMENT MODAL & PRINTABLE RGE CORPORATE STATEMENT
+     ======================================================================== */
+  function buildVerticalARTableHTML(r) {
+    const m = computeMetrics(r);
+    const activePbs = (r.pbs || []).filter((pb) => Number(pb.amount) > 0 || pb.date || pb.siNo);
+    const pbRows = activePbs.length
+      ? activePbs
+          .map((pb) => {
+            const pct = m.po > 0 ? (pb.amount / m.po) * 100 : 0;
+            return `
+              <tr class="st-pb"><td class="st-k">Progress Billing ${pb.num} (PB${pb.num})</td><td class="st-v mono"><strong>${fmtMoney(pb.amount)}</strong> (${fmtPct(pct)})</td></tr>
+              <tr class="st-pb-sub"><td class="st-k">PB${pb.num} Date / Sales Invoice # / Sales Invoice Date</td><td class="st-v mono">${esc(pb.date || "—")} &nbsp;|&nbsp; Sales Invoice #: ${esc(pb.siNo || "—")} &nbsp;|&nbsp; ${esc(pb.siDate || "—")}</td></tr>`;
+          })
+          .join("")
+      : `<tr class="st-pb"><td class="st-k">Progress Billing (PB1–PB10)</td><td class="st-v muted">No progress billing recorded yet</td></tr>`;
+
+    return `
+      <table class="ar-vert-sheet">
+        <tbody>
+          <tr class="st-navy"><td class="st-k">Project Title</td><td class="st-v"><strong>${esc(r.projectTitle)}</strong></td></tr>
+          <tr class="st-navy"><td class="st-k">Client</td><td class="st-v">${esc(r.client)}</td></tr>
+          <tr class="st-navy"><td class="st-k">End User</td><td class="st-v">${esc(r.endUser || "—")}</td></tr>
+          <tr class="st-navy"><td class="st-k">Project Site</td><td class="st-v">${esc(r.projectSite || "—")}</td></tr>
+          <tr class="st-navy"><td class="st-k">Purchase Order No.</td><td class="st-v mono">${esc(r.poNo || "—")}</td></tr>
+          <tr class="st-navy"><td class="st-k">Purchase Order Amount</td><td class="st-v mono"><strong>${fmtMoney(m.po)}</strong></td></tr>
+          <tr class="st-navy"><td class="st-k">Purchase Order Date</td><td class="st-v mono">${esc(r.poDate || "—")}</td></tr>
+
+          <tr class="st-dp"><td class="st-k">Down Payment</td><td class="st-v mono"><strong>${fmtMoney(m.dp)}</strong> (${fmtPct(m.dpPct)})</td></tr>
+          <tr class="st-dp"><td class="st-k">DP Date / Sales Invoice # / Sales Invoice Date</td><td class="st-v mono">${esc(r.dpDate || "—")} &nbsp;|&nbsp; Sales Invoice #: ${esc(r.dpSiNo || "—")} &nbsp;|&nbsp; ${esc(r.dpSiDate || "—")}</td></tr>
+
+          ${pbRows}
+
+          <tr class="st-final"><td class="st-k">Final Payment</td><td class="st-v mono"><strong>${fmtMoney(m.fin)}</strong> (${fmtPct(m.finalPct)})</td></tr>
+          <tr class="st-final"><td class="st-k">Final Date / Sales Invoice # / Sales Invoice Date</td><td class="st-v mono">${esc(r.finalDate || "—")} &nbsp;|&nbsp; Sales Invoice #: ${esc(r.finalSiNo || "—")} &nbsp;|&nbsp; ${esc(r.finalSiDate || "—")}</td></tr>
+
+          <tr class="st-cyan"><td class="st-k">Total Payment Received</td><td class="st-v mono"><strong>${fmtMoney(m.totalReceived)}</strong></td></tr>
+          <tr class="st-rose"><td class="st-k">2307 w/holding tax</td><td class="st-v mono"><strong>${fmtMoney(m.ewt)}</strong></td></tr>
+          <tr class="st-white"><td class="st-k">Total % Paid</td><td class="st-v mono"><strong>${fmtPct(m.totalPctPaid)}</strong></td></tr>
+          <tr class="st-cyan"><td class="st-k">Payment Remarks</td><td class="st-v"><span class="ar-rem-pill ${m.remarksClass}">${esc(m.remarks)}</span></td></tr>
+          <tr class="st-cyan"><td class="st-k">Account Receivable (Balance)</td><td class="st-v mono"><strong style="font-size:1.05em">${fmtMoney(m.arBalance)}</strong></td></tr>
+          <tr class="st-white"><td class="st-k">Terms</td><td class="st-v">${esc(r.terms || "—")}</td></tr>
+          <tr class="st-white"><td class="st-k">TPC Cost / Est. Gross Margin</td><td class="st-v mono">${fmtMoney(m.tpc)} &nbsp;|&nbsp; Margin: <strong>${fmtMoney(m.grossMargin)} (${fmtPct(m.marginPct)})</strong></td></tr>
+        </tbody>
+      </table>`;
+  }
+
+  function openARViewModal(recordId) {
+    const rec = arState.records.find((r) => r.id === recordId);
+    if (!rec) return;
+    arState.viewingId = recordId;
+    dom.viewCode.textContent = `${rec.id} • ${rec.poNo || "NO PURCHASE ORDER"}`;
+    dom.viewTitle.textContent = rec.projectTitle;
+    dom.viewBody.innerHTML = buildVerticalARTableHTML(rec);
+    dom.viewBackdrop.classList.add("is-open");
+    dom.viewBackdrop.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeARViewModal() {
+    dom.viewBackdrop.classList.remove("is-open");
+    dom.viewBackdrop.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+    arState.viewingId = null;
+  }
+
+  function printARRecord(recordId) {
+    const rec = arState.records.find((r) => r.id === recordId) || arState.draft;
+    if (!rec) return;
+    const win = window.open("", "_blank", "width=920,height=780");
+    if (!win) {
+      toast("Pop-up blocked — allow pop-ups to print the AR statement.");
+      return;
+    }
+    const tableHTML = buildVerticalARTableHTML(rec);
+    const printedAt = new Date().toLocaleString("en-US", { dateStyle: "long", timeStyle: "short" });
+
+    win.document.write(`<!DOCTYPE html><html><head><title>${esc(rec.poNo || rec.id)} — Account Receivable Statement</title>
+      <style>
+        *{box-sizing:border-box}
+        body{font-family:Inter,Arial,sans-serif;color:#0F172A;margin:0;padding:24px;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+        .hdr{display:flex;justify-content:space-between;align-items:center;padding-bottom:12px;}
+        .hdr-l{display:flex;align-items:center;gap:12px;}
+        .hdr-l img{width:56px;height:56px;object-fit:contain;}
+        .hdr-w{font-weight:800;font-size:15px;line-height:1.15;color:#0A0E17;}
+        .hdr-r{font-size:12px;text-align:right;color:#111827;line-height:1.35;}
+        .accent-bar{display:flex;height:14px;margin-bottom:18px;}
+        .ab-gray{width:54%;height:5px;background:#636569;align-self:flex-end;}
+        .ab-blue{width:18px;background:#2573BA;transform:skewX(-32deg);margin:0 4px;}
+        .ab-navy{flex:1;background:#142A54;}
+        .doc-title{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;}
+        .doc-title h1{font-size:17px;margin:0;color:#002060;letter-spacing:0.02em;text-transform:uppercase;}
+        .doc-title span{font-size:11px;color:#64748B;}
+        .ar-vert-sheet{width:100%;border-collapse:collapse;font-size:12px;border:1px solid #CBD5E1;}
+        .ar-vert-sheet td{padding:7px 11px;border:1px solid #CBD5E1;}
+        .ar-vert-sheet .st-k{width:34%;font-weight:700;}
+        .ar-vert-sheet .st-v{width:66%;background:#FFFFFF;}
+        .st-navy .st-k{background:#002060;color:#FFFFFF;}
+        .st-dp .st-k{background:#68D37E;color:#052E16;}
+        .st-pb .st-k,.st-pb-sub .st-k{background:#DA96DE;color:#3B0764;}
+        .st-final .st-k{background:#EB9E71;color:#431407;}
+        .st-cyan .st-k{background:#4FC3F7;color:#082F49;}
+        .st-rose .st-k{background:#F8BBD0;color:#B91C1C;}
+        .st-white .st-k{background:#F8FAFD;color:#0F172A;}
+        .mono{font-family:Consolas,monospace;}
+        .muted{color:#64748B;}
+        .ar-rem-pill{display:inline-block;padding:2px 9px;border-radius:999px;font-weight:700;font-size:11px;}
+        .ar-rem-paid{background:#DCFCE7;color:#15803D;}
+        .ar-rem-good{background:#CCFBF1;color:#0F766E;}
+        .ar-rem-billing{background:#FEF3C7;color:#B45309;}
+        .sigs{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:34px;font-size:12px;}
+        .sig-line{border-top:1px solid #475569;padding-top:6px;margin-top:34px;font-weight:600;color:#334155;}
+        .ftr{margin-top:26px;padding-top:10px;border-top:3px solid #142A54;display:flex;justify-content:space-between;font-size:11px;color:#334155;}
+      </style></head><body>
+      <div class="hdr">
+        <div class="hdr-l">
+          <img src="${window.location.origin}/Images/RGE%20Logo.jpg" alt="RGE" />
+          <div class="hdr-w">INFRA &amp; INFORMATION<br/>TECHNOLOGY SERVICES</div>
+        </div>
+        <div class="hdr-r">Unit 210, Don Raul Building, #77<br/>Kamuning Road, Quezon City</div>
+      </div>
+      <div class="accent-bar"><div class="ab-gray"></div><div class="ab-blue"></div><div class="ab-navy"></div></div>
+      <div class="doc-title">
+        <h1>Account Receivable Record Statement</h1>
+        <span>Ref: ${esc(rec.id)} &bull; Printed ${esc(printedAt)}</span>
+      </div>
+      ${tableHTML}
+      <div class="sigs">
+        <div>Prepared by:<div class="sig-line">Accounting / Project Coordinator</div></div>
+        <div>Reviewed &amp; Approved by:<div class="sig-line">Authorized Signatory — RGE Infra &amp; IT</div></div>
+      </div>
+      <div class="ftr">
+        <span>admin@rgeitservices.com &bull; www.rgeinfraitservices.com</span>
+        <span>+63 917 637 9769 &bull; +63 917 180 3070</span>
+      </div>
+      <script>window.onload=()=>setTimeout(()=>window.print(),300);</script>
+      </body></html>`);
+    win.document.close();
   }
 
   /* ========================================================================
@@ -1014,6 +1459,18 @@ window.RGE_AR_MODULE = (() => {
     dom.btnAddRecord.addEventListener("click", () => openARDrawer(null));
 
     const openHandler = (e) => {
+      const viewBtn = e.target.closest("[data-ar-view]");
+      if (viewBtn) {
+        e.stopPropagation();
+        openARViewModal(viewBtn.getAttribute("data-ar-view"));
+        return;
+      }
+      const printBtn = e.target.closest("[data-ar-print]");
+      if (printBtn) {
+        e.stopPropagation();
+        printARRecord(printBtn.getAttribute("data-ar-print"));
+        return;
+      }
       const row = e.target.closest("[data-ar-open]");
       if (row) openARDrawer(row.getAttribute("data-ar-open"));
     };
@@ -1024,15 +1481,60 @@ window.RGE_AR_MODULE = (() => {
     dom.drawerBackdrop.addEventListener("click", closeARDrawer);
     dom.btnSaveDrawer.addEventListener("click", saveARDrawer);
     dom.btnDeleteDrawer.addEventListener("click", deleteARRecord);
+    if (dom.btnPrintDrawer) {
+      dom.btnPrintDrawer.addEventListener("click", () => {
+        syncDraftFromInputs();
+        printARRecord(arState.editingId);
+      });
+    }
+
+    if (dom.btnCloseView) dom.btnCloseView.addEventListener("click", closeARViewModal);
+    if (dom.viewBackdrop) {
+      dom.viewBackdrop.addEventListener("click", (e) => {
+        if (e.target === dom.viewBackdrop) closeARViewModal();
+      });
+    }
+    if (dom.btnEditFromView) {
+      dom.btnEditFromView.addEventListener("click", () => {
+        const id = arState.viewingId;
+        closeARViewModal();
+        if (id) openARDrawer(id);
+      });
+    }
+    if (dom.btnPrintFromView) {
+      dom.btnPrintFromView.addEventListener("click", () => {
+        if (arState.viewingId) printARRecord(arState.viewingId);
+      });
+    }
 
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && dom.drawer.classList.contains("is-open")) {
-        closeARDrawer();
+      if (e.key === "Escape") {
+        if (dom.viewBackdrop?.classList.contains("is-open")) closeARViewModal();
+        else if (dom.drawer.classList.contains("is-open")) closeARDrawer();
       }
     });
 
     renderAR();
   }
 
-  return { init, renderAR, openARDrawer, openOrCreateFromAwarded, resetDemoAR };
+  /* Cascade delete matching AR record when parent project is deleted */
+  function deleteByProject(proj) {
+    if (!proj) return false;
+    const poClean = (proj.po || "").trim().toLowerCase();
+    const titleClean = (proj.name || "").trim().toLowerCase();
+    const before = arState.records.length;
+    arState.records = arState.records.filter((r) => {
+      const matchPo = poClean && (r.poNo || "").trim().toLowerCase() === poClean;
+      const matchTitle = titleClean && (r.projectTitle || "").trim().toLowerCase() === titleClean;
+      return !(matchPo || matchTitle);
+    });
+    if (arState.records.length !== before) {
+      saveAR();
+      renderAR();
+      return true;
+    }
+    return false;
+  }
+
+  return { init, renderAR, openARDrawer, openOrCreateFromAwarded, deleteByProject };
 })();
