@@ -8,16 +8,18 @@
 (() => {
   const { COLUMNS, STATUS_COLUMNS, INITIAL_PROJECTS } = window.RGE_TRACKER_DATA;
 
-  const STORAGE_KEY = "rge_project_tracker_v2";
+  const STORAGE_KEY = "rge_project_tracker_v3";
+  const SETTINGS_KEY = "rge_project_tracker_settings_v1";
   const colById = Object.fromEntries(COLUMNS.map((c) => [c.id, c]));
   const statusById = Object.fromEntries(STATUS_COLUMNS.map((s) => [s.id, s]));
 
   const state = {
     projects: loadProjects(),
-    activeTab: "tracks",      // 'tracks' | 'status' | 'overview'
+    settings: loadSettings(),
+    activeTab: "overview",    // 'overview' | 'tracks' | 'status' | 'ar' | 'settings'
     viewMode: "board",        // 'board' | 'table'
-    mobileCol: "all",         // mobile filter for Tab 1 (Service Tracks)
-    mobileStatusCol: "all",   // mobile filter for Tab 2 (Status Board)
+    mobileCol: "all",         // mobile filter for Service Tracks
+    mobileStatusCol: "all",   // mobile filter for Project Status Board
     tableColFilter: "all",
     statusFilter: "all",
     priorityFilter: "all",
@@ -29,6 +31,10 @@
   };
 
   const el = {
+    appShell: document.getElementById("app-shell"),
+    leftSidebar: document.getElementById("left-sidebar"),
+    sidebarBackdrop: document.getElementById("sidebar-backdrop"),
+    btnToggleSidebar: document.getElementById("btn-toggle-sidebar"),
     liveSyncLabel: document.getElementById("live-sync-label"),
     boardListSwitcher: document.getElementById("board-list-switcher"),
     kpiTotalCount: document.getElementById("kpi-total-count"),
@@ -48,7 +54,9 @@
     panelTracks: document.getElementById("panel-tracks"),
     panelStatus: document.getElementById("panel-status"),
     panelOverview: document.getElementById("panel-overview"),
+    panelAwarded: document.getElementById("panel-awarded"),
     panelAr: document.getElementById("panel-ar"),
+    panelSettings: document.getElementById("panel-settings"),
     topKpiStrip: document.querySelector("#main-workspace > .kpi-strip"),
     // Tab 1 (4 Service Columns)
     mobileColumnTabs: document.getElementById("mobile-column-tabs"),
@@ -85,6 +93,39 @@
   /* ========================================================================
      STORAGE & FORMATTERS
      ======================================================================== */
+  function loadSettings() {
+    const defaults = {
+      companyName: "RGE Infra & Information Technology Services",
+      hqAddress: "Unit 210, Don Raul Building, #77 Kamuning Road, Quezon City",
+      defaultTrack: "supply-install",
+      defaultStatus: "On-going project",
+      defaultTerms: "50% DP, 40% Progress Billing, 10% Completion",
+      appScriptUrl: ""
+    };
+    try {
+      const saved = localStorage.getItem(SETTINGS_KEY);
+      if (saved) return { ...defaults, ...JSON.parse(saved) };
+    } catch (_) {}
+    return defaults;
+  }
+
+  function saveSettings() {
+    try {
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify(state.settings));
+    } catch (_) {}
+  }
+
+  function populateSettingsForm() {
+    const s = state.settings;
+    const setVal = (id, v) => { const node = document.getElementById(id); if (node) node.value = v || ""; };
+    setVal("set-company-name", s.companyName);
+    setVal("set-hq-address", s.hqAddress);
+    setVal("set-default-track", s.defaultTrack);
+    setVal("set-default-status", s.defaultStatus);
+    setVal("set-default-terms", s.defaultTerms);
+    setVal("set-appscript-url", s.appScriptUrl);
+  }
+
   function loadProjects() {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -185,6 +226,7 @@
     renderTab2StatusBoard(filteredForStatusBoard);
     renderMasterTable(filteredForTracks);
     renderTab3OverviewAndDistribution(state.projects);
+    if (window.RGE_AWARDED_MODULE) window.RGE_AWARDED_MODULE.render();
     syncTabAndViewUI();
   }
 
@@ -578,10 +620,13 @@
   function syncTabAndViewUI() {
     const tab = state.activeTab;
     const isOverview = tab === "overview";
+    const isAwarded = tab === "awarded";
     const isAR = tab === "ar";
-    const isTable = !isOverview && !isAR && state.viewMode === "table";
+    const isSettings = tab === "settings";
+    const isBoardTab = tab === "tracks" || tab === "status";
+    const isTable = isBoardTab && state.viewMode === "table";
 
-    // Top primary tabs + mobile bottom bar tabs
+    // Left vertical menu items + mobile bottom bar tabs
     document.querySelectorAll("[data-main-tab]").forEach((b) => {
       const active = b.getAttribute("data-main-tab") === tab;
       b.classList.toggle("is-active", active);
@@ -591,30 +636,52 @@
       b.classList.toggle("is-active", b.getAttribute("data-mob-main-tab") === tab);
     });
 
-    // Show/Hide Boards, List, Toolbar, Overview, and Account Receivable
-    if (el.topKpiStrip) el.topKpiStrip.hidden = isAR;
-    el.boardListSwitcher.hidden = isOverview || isAR;
-    el.sharedFilterToolbar.hidden = isOverview || isAR;
+    // Show/Hide KPIs, Toolbar & Panels cleanly
+    if (el.topKpiStrip) el.topKpiStrip.hidden = isAwarded || isAR || isSettings;
+    el.boardListSwitcher.hidden = !isBoardTab;
+    el.sharedFilterToolbar.hidden = !isBoardTab;
     el.statusFilterPills.hidden = tab === "status";
 
     el.panelTracks.hidden = !(tab === "tracks" && !isTable);
     el.panelStatus.hidden = !(tab === "status" && !isTable);
     el.masterTableSection.hidden = !isTable;
     el.panelOverview.hidden = !isOverview;
+    if (el.panelAwarded) el.panelAwarded.hidden = !isAwarded;
     if (el.panelAr) el.panelAr.hidden = !isAR;
+    if (el.panelSettings) el.panelSettings.hidden = !isSettings;
 
     el.btnModeBoard.classList.toggle("is-active", state.viewMode === "board");
     el.btnModeTable.classList.toggle("is-active", state.viewMode === "table");
   }
 
+  function openMobileSidebar() {
+    if (!el.leftSidebar) return;
+    el.leftSidebar.classList.add("is-open");
+    el.sidebarBackdrop.classList.add("is-open");
+    el.btnToggleSidebar.setAttribute("aria-expanded", "true");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeMobileSidebar() {
+    if (!el.leftSidebar) return;
+    el.leftSidebar.classList.remove("is-open");
+    el.sidebarBackdrop.classList.remove("is-open");
+    el.btnToggleSidebar.setAttribute("aria-expanded", "false");
+    document.body.style.overflow = "";
+  }
+
   function switchMainTab(tabName) {
     state.activeTab = tabName;
-    if (tabName === "overview" || tabName === "ar") {
+    if (tabName === "overview" || tabName === "ar" || tabName === "settings") {
       state.viewMode = "board";
     }
+    closeMobileSidebar();
     renderAll();
     if (tabName === "ar" && window.RGE_AR_MODULE) {
       window.RGE_AR_MODULE.renderAR();
+    }
+    if (tabName === "settings") {
+      populateSettingsForm();
     }
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -1007,23 +1074,93 @@
     el.btnModeBoard.addEventListener("click", () => { state.viewMode = "board"; syncTabAndViewUI(); });
     el.btnModeTable.addEventListener("click", () => { state.viewMode = "table"; syncTabAndViewUI(); });
 
+    // Sidebar Collapse (Desktop) & Drawer (Mobile)
+    document.getElementById("btn-collapse-sidebar").addEventListener("click", () => {
+      el.appShell.classList.toggle("is-collapsed");
+    });
+    el.btnToggleSidebar.addEventListener("click", openMobileSidebar);
+    document.getElementById("btn-close-sidebar").addEventListener("click", closeMobileSidebar);
+    el.sidebarBackdrop.addEventListener("click", closeMobileSidebar);
+
     // Command Bar Actions
     document.getElementById("btn-new-project").addEventListener("click", () => {
       if (state.activeTab === "ar" && window.RGE_AR_MODULE) {
         window.RGE_AR_MODULE.openARDrawer(null);
+      } else if (state.activeTab === "awarded" && window.RGE_AWARDED_MODULE) {
+        window.RGE_AWARDED_MODULE.openDrawer(null);
       } else {
-        openAddModal();
-      }
-    });
-    document.getElementById("mob-btn-add").addEventListener("click", () => {
-      if (state.activeTab === "ar" && window.RGE_AR_MODULE) {
-        window.RGE_AR_MODULE.openARDrawer(null);
-      } else {
-        openAddModal();
+        openAddModal({ column: state.settings.defaultTrack, status: state.settings.defaultStatus });
       }
     });
     document.getElementById("btn-export-csv").addEventListener("click", exportCSV);
     document.getElementById("btn-print-report").addEventListener("click", () => window.print());
+
+    // Settings Panel Actions
+    document.getElementById("form-settings").addEventListener("submit", (e) => {
+      e.preventDefault();
+      state.settings = {
+        companyName: document.getElementById("set-company-name").value.trim(),
+        hqAddress: document.getElementById("set-hq-address").value.trim(),
+        defaultTrack: document.getElementById("set-default-track").value,
+        defaultStatus: document.getElementById("set-default-status").value,
+        defaultTerms: document.getElementById("set-default-terms").value.trim(),
+        appScriptUrl: document.getElementById("set-appscript-url").value.trim()
+      };
+      saveSettings();
+      showToast("Workspace settings saved.");
+    });
+
+    document.getElementById("btn-backup-json").addEventListener("click", () => {
+      const arRaw = localStorage.getItem("rge_project_tracker_ar_v2");
+      const payload = {
+        exportedAt: new Date().toISOString(),
+        settings: state.settings,
+        projects: state.projects,
+        accountReceivable: arRaw ? JSON.parse(arRaw) : []
+      };
+      downloadFile(`RGE_Workspace_Backup_${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify(payload, null, 2), "application/json;charset=utf-8");
+      showToast("Downloaded full RGE Workspace JSON backup.");
+    });
+
+    document.getElementById("input-restore-json").addEventListener("change", (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const parsed = JSON.parse(String(reader.result));
+          if (Array.isArray(parsed.projects)) {
+            state.projects = parsed.projects;
+            saveProjects();
+          }
+          if (Array.isArray(parsed.accountReceivable)) {
+            localStorage.setItem("rge_project_tracker_ar_v2", JSON.stringify(parsed.accountReceivable));
+          }
+          if (parsed.settings) {
+            state.settings = { ...state.settings, ...parsed.settings };
+            saveSettings();
+            populateSettingsForm();
+          }
+          if (window.RGE_AR_MODULE) window.RGE_AR_MODULE.init();
+          renderAll();
+          showToast("Workspace backup restored successfully.");
+        } catch (_) {
+          showToast("Invalid JSON backup file.");
+        }
+        e.target.value = "";
+      };
+      reader.readAsText(file);
+    });
+
+    const resetAllHandler = () => {
+      localStorage.removeItem(STORAGE_KEY);
+      state.projects = structuredClone(INITIAL_PROJECTS);
+      clearFilters();
+      updateClock();
+      if (window.RGE_AR_MODULE) window.RGE_AR_MODULE.resetDemoAR();
+      showToast("Restored default RGE Project Tracker & AR records.");
+    };
+    document.getElementById("btn-settings-reset").addEventListener("click", resetAllHandler);
 
     // Search, Status Chips, Priority & Sort
     el.inputSearch.addEventListener("input", (e) => { state.search = e.target.value; renderAll(); });
@@ -1124,13 +1261,23 @@
       if (e.key === "Escape") {
         if (el.modalBackdrop.classList.contains("is-open")) closeAddModal();
         if (el.detailDrawer.classList.contains("is-open")) closeDetail();
+        if (el.leftSidebar?.classList.contains("is-open")) closeMobileSidebar();
       }
     });
   }
 
   updateClock();
   setInterval(updateClock, 60000);
+  populateSettingsForm();
   bindEvents();
   if (window.RGE_AR_MODULE) window.RGE_AR_MODULE.init();
+  if (window.RGE_AWARDED_MODULE) {
+    window.RGE_AWARDED_MODULE.init({
+      getProjects: () => state.projects,
+      saveAndRender: () => { saveProjects(); updateClock(); renderAll(); },
+      switchMainTab,
+      colById
+    });
+  }
   renderAll();
 })();

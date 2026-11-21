@@ -14,23 +14,44 @@
   <a href="#main-workspace" class="skip-link">Skip to Project Tracker</a>
 
   <!-- ====================================================================== -->
-  <!-- OFFICIAL RGE CORPORATE LETTERHEAD HEADER (Images/RGE Header.png)       -->
+  <!-- RGE CORPORATE HEADER (Pure HTML/CSS Letterhead + Images/RGE Logo.jpg)  -->
   <!-- ====================================================================== -->
   <header class="corporate-header" role="banner">
-    <div class="letterhead-shell">
-      <div class="container letterhead-container">
-        <img
-          src="Images/RGE Header.png"
-          alt="RGE Infra &amp; Information Technology Services — Unit 210, Don Raul Building, #77 Kamuning Road, Quezon City"
-          class="letterhead-img"
-        />
+    <div class="rge-lh-header">
+      <div class="rge-lh-bg-slashes" aria-hidden="true"></div>
+      <div class="rge-lh-inner">
+        <div class="rge-lh-brand">
+          <img src="Images/RGE Logo.jpg" alt="RGE Logo" class="rge-lh-logo" />
+          <div class="rge-lh-wordmark">
+            <span>INFRA &amp; INFORMATION</span>
+            <span>TECHNOLOGY SERVICES</span>
+          </div>
+        </div>
+
+        <div class="rge-lh-address">
+          <svg class="rge-lh-pin" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>
+          <div class="rge-lh-address-lines">
+            <span>Unit 210, Don Raul Building, #77</span>
+            <span>Kamuning Road, Quezon City</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Signature RGE Diagonal Accent Bar (Charcoal -> Cerulean Slash -> Deep Navy) -->
+      <div class="rge-lh-bottom-bar" aria-hidden="true">
+        <div class="rge-bar-gray"></div>
+        <div class="rge-bar-slash"></div>
+        <div class="rge-bar-navy"></div>
       </div>
     </div>
 
     <!-- Sticky App Command Bar -->
     <div class="app-command-bar">
-      <div class="container command-inner">
+      <div class="app-shell-bar-inner command-inner">
         <div class="command-title-group">
+          <button class="sidebar-mobile-trigger" id="btn-toggle-sidebar" type="button" aria-label="Open navigation menu" aria-expanded="false" aria-controls="left-sidebar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
           <div class="rge-signal-dots" aria-hidden="true">
             <span class="sig-dot lg"></span>
             <span class="sig-dot md"></span>
@@ -71,46 +92,91 @@
         </div>
       </div>
     </div>
-
-    <!-- ==================================================================== -->
-    <!-- NEW PRIMARY TAB BAR (3 WORKSPACE TABS)                               -->
-    <!--   Tab 1: Service Tracks (Supply & Delivery, Supply only, etc.)       -->
-    <!--   Tab 2: Project Status Board (Survey, Awarded, On-going, Completed, Hold) -->
-    <!--   Tab 3: Project Status Overview & Distribution                      -->
-    <!-- ==================================================================== -->
-    <nav class="primary-tab-bar" aria-label="Workspace tabs">
-      <div class="container tab-bar-inner" role="tablist">
-        <button class="primary-tab is-active" id="tab-btn-tracks" data-main-tab="tracks" role="tab" aria-selected="true" type="button">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
-          <span>Service Tracks</span>
-          <span class="tab-pill-badge" id="tab-badge-tracks">4 cols</span>
-        </button>
-
-        <button class="primary-tab" id="tab-btn-status" data-main-tab="status" role="tab" aria-selected="false" type="button">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-          <span>Project Status Board</span>
-          <span class="tab-pill-badge" id="tab-badge-status">5 cols</span>
-        </button>
-
-        <button class="primary-tab" id="tab-btn-overview" data-main-tab="overview" role="tab" aria-selected="false" type="button">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
-          <span>Project Status Overview &amp; Distribution</span>
-          <span class="tab-pill-badge badge-analytics">Analytics</span>
-        </button>
-
-        <button class="primary-tab" id="tab-btn-ar" data-main-tab="ar" role="tab" aria-selected="false" type="button">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/><line x1="6" y1="15" x2="10" y2="15"/></svg>
-          <span>Account Receivable</span>
-          <span class="tab-pill-badge badge-ar" id="tab-badge-ar">7 AR</span>
-        </button>
-      </div>
-    </nav>
   </header>
 
+  <!-- Mobile Sidebar Backdrop -->
+  <div class="sidebar-backdrop" id="sidebar-backdrop" aria-hidden="true"></div>
+
   <!-- ====================================================================== -->
-  <!-- MAIN WORKSPACE                                                         -->
+  <!-- APP SHELL: LEFT VERTICAL SIDEBAR MENU + MAIN WORKSPACE                 -->
+  <!-- Sequence:                                                              -->
+  <!--   1. Project Status Overview & Distribution                            -->
+  <!--   2. Service Tracks                                                    -->
+  <!--   3. Project Status Board                                              -->
+  <!--   4. Account Receivable                                                -->
+  <!--   5. Settings                                                          -->
   <!-- ====================================================================== -->
-  <main id="main-workspace" class="tracker-main container">
+  <div class="app-shell" id="app-shell">
+    <aside class="left-sidebar" id="left-sidebar" aria-label="Main workspace navigation">
+      <div class="sidebar-head">
+        <span class="sidebar-section-label">WORKSPACE MENU</span>
+        <button class="sidebar-collapse-btn" id="btn-collapse-sidebar" type="button" title="Collapse / Expand Menu" aria-label="Collapse or expand navigation menu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <button class="sidebar-close-mobile" id="btn-close-sidebar" type="button" aria-label="Close navigation menu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <nav class="vertical-nav" role="tablist" aria-orientation="vertical">
+        <button class="vnav-item is-active" id="tab-btn-overview" data-main-tab="overview" role="tab" aria-selected="true" type="button" title="Project Status Overview &amp; Distribution">
+          <span class="vnav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+          </span>
+          <span class="vnav-label">Project Status Overview &amp; Distribution</span>
+          <span class="vnav-badge badge-analytics">Live</span>
+        </button>
+
+        <button class="vnav-item" id="tab-btn-tracks" data-main-tab="tracks" role="tab" aria-selected="false" type="button" title="Service Tracks">
+          <span class="vnav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+          </span>
+          <span class="vnav-label">Service Tracks</span>
+          <span class="vnav-badge" id="tab-badge-tracks">4</span>
+        </button>
+
+        <button class="vnav-item" id="tab-btn-status" data-main-tab="status" role="tab" aria-selected="false" type="button" title="Project Status Board">
+          <span class="vnav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          </span>
+          <span class="vnav-label">Project Status Board</span>
+          <span class="vnav-badge" id="tab-badge-status">5</span>
+        </button>
+
+        <button class="vnav-item" id="tab-btn-awarded" data-main-tab="awarded" role="tab" aria-selected="false" type="button" title="Project Awarded">
+          <span class="vnav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+          </span>
+          <span class="vnav-label">Project Awarded</span>
+          <span class="vnav-badge badge-awarded" id="tab-badge-awarded">17</span>
+        </button>
+
+        <button class="vnav-item" id="tab-btn-ar" data-main-tab="ar" role="tab" aria-selected="false" type="button" title="Account Receivable">
+          <span class="vnav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/><line x1="6" y1="15" x2="10" y2="15"/></svg>
+          </span>
+          <span class="vnav-label">Account Receivable</span>
+          <span class="vnav-badge badge-ar" id="tab-badge-ar">7 AR</span>
+        </button>
+
+        <div class="vnav-divider" aria-hidden="true"></div>
+
+        <button class="vnav-item" id="tab-btn-settings" data-main-tab="settings" role="tab" aria-selected="false" type="button" title="Settings">
+          <span class="vnav-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l-.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.6.85 1 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          </span>
+          <span class="vnav-label">Settings</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer-card">
+        <div class="sf-title">RGE PMO Workspace</div>
+        <div class="sf-meta">Quezon City HQ &bull; Local Sync</div>
+      </div>
+    </aside>
+
+    <!-- MAIN WORKSPACE -->
+    <main id="main-workspace" class="tracker-main">
     <!-- Top Executive KPI Summary Strip (Always synced across all tabs) -->
     <section class="kpi-strip" aria-label="Portfolio Metrics">
       <article class="kpi-card">
@@ -331,6 +397,126 @@
     </div>
 
     <!-- ==================================================================== -->
+    <!-- NEW TAB PANEL: PROJECT AWARDED (UNIFIED WITH BOARDS + AR BRIDGE)     -->
+    <!-- ==================================================================== -->
+    <div id="panel-awarded" class="tab-panel ar-stack" hidden>
+      <!-- Top 4 KPI Summary Cards -->
+      <section class="kpi-strip" aria-label="Project Awarded Executive Summary">
+        <article class="kpi-card">
+          <div class="kpi-top">
+            <span class="kpi-label">Total Awarded Projects</span>
+            <span class="kpi-icon icon-navy" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg></span>
+          </div>
+          <div class="kpi-value" id="aw-kpi-count">0</div>
+          <div class="kpi-sub" id="aw-kpi-count-sub">0 On-going &bull; 0 Pending / TBA</div>
+        </article>
+
+        <article class="kpi-card">
+          <div class="kpi-top">
+            <span class="kpi-label">Total Awarded P.O Value</span>
+            <span class="kpi-icon icon-blue" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>
+          </div>
+          <div class="kpi-value kpi-mono" id="aw-kpi-po">&#8369; 0</div>
+          <div class="kpi-sub" id="aw-kpi-po-sub">Projected Margin: &#8369; 0</div>
+        </article>
+
+        <article class="kpi-card">
+          <div class="kpi-top">
+            <span class="kpi-label">Total Working Budget</span>
+            <span class="kpi-icon icon-teal" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>
+          </div>
+          <div class="kpi-value kpi-mono" id="aw-kpi-budget">&#8369; 0</div>
+          <div class="kpi-sub" id="aw-kpi-margin-sub">Projected Gross Margin: 0%</div>
+        </article>
+
+        <article class="kpi-card">
+          <div class="kpi-top">
+            <span class="kpi-label">Average Accomplishment</span>
+            <span class="kpi-icon icon-green" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>
+          </div>
+          <div class="kpi-value" id="aw-kpi-accomp">0%</div>
+          <div class="kpi-sub" id="aw-kpi-sched-sub">0 on schedule &bull; 0 delayed</div>
+        </article>
+      </section>
+
+      <!-- Project Awarded Filter Toolbar -->
+      <section class="filter-toolbar" aria-label="Filter Project Awarded">
+        <div class="search-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="search" id="aw-search-input" class="search-input" placeholder="Search project title, client, end user, site, proposal #, P.O #, or PIC..." aria-label="Search awarded projects" />
+        </div>
+
+        <div class="status-pills" id="aw-exec-pills" role="group" aria-label="Filter by Execution Status">
+          <button class="status-chip is-active" data-aw-exec="all" type="button">All</button>
+          <button class="status-chip" data-aw-exec="Pending Mobilization / TBA" type="button">Pending / TBA</button>
+          <button class="status-chip" data-aw-exec="Mobilizing" type="button">Mobilizing</button>
+          <button class="status-chip" data-aw-exec="On-going" type="button">On-going</button>
+          <button class="status-chip" data-aw-exec="On Hold" type="button">On Hold</button>
+          <button class="status-chip" data-aw-exec="Completed" type="button">Completed</button>
+        </div>
+
+        <div class="toolbar-right">
+          <label for="aw-track-filter" class="sr-only">Filter by Service Track</label>
+          <select id="aw-track-filter" class="select-control">
+            <option value="all">All Service Tracks</option>
+            <option value="supply-delivery">Supply &amp; Delivery</option>
+            <option value="supply-only">Supply only</option>
+            <option value="supply-install">Supply &amp; Install</option>
+            <option value="install-services">Install/Services</option>
+          </select>
+          <button type="button" class="btn btn-outline btn-sm" id="aw-btn-export-csv">Export CSV</button>
+          <button type="button" class="btn btn-primary btn-sm" id="aw-btn-add">+ Add Awarded</button>
+        </div>
+      </section>
+
+      <!-- Grouped Master Table (Desktop/Tablet) + Stacked Cards (Mobile) -->
+      <section class="analytics-card">
+        <div class="analytics-header compact">
+          <div>
+            <h2>Project Awarded — Commercial, Budget &amp; Mobilization Tracker</h2>
+            <p>Auto-synced with Service Tracks &amp; Project Status Board. Click any row to edit costing/dates or bridge directly to the AR Ledger.</p>
+          </div>
+          <div class="ar-color-legend" aria-hidden="true">
+            <span><i style="background:#1C305C"></i>Project Info</span>
+            <span><i style="background:#2573BA"></i>Commercial</span>
+            <span><i style="background:#0F766E"></i>Schedule</span>
+            <span><i style="background:#B45309"></i>Execution</span>
+          </div>
+        </div>
+
+        <div class="ar-table-scroll">
+          <table class="aw-master-table">
+            <thead>
+              <tr class="ar-group-row">
+                <th colspan="2" class="aw-grp-info">Project Info</th>
+                <th colspan="2" class="aw-grp-comm">Commercial &amp; Costing</th>
+                <th colspan="2" class="aw-grp-sched">Schedule &amp; Variance</th>
+                <th colspan="2" class="aw-grp-exec">Execution</th>
+              </tr>
+              <tr class="aw-col-row">
+                <th>Project &amp; Site</th>
+                <th>Client / End User</th>
+                <th>Proposal &amp; P.O Ref</th>
+                <th>Budget &amp; Margin</th>
+                <th>Mob. / Impl. Dates</th>
+                <th>Target vs. Actual</th>
+                <th>Accomplishment</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="aw-table-body"></tbody>
+          </table>
+        </div>
+
+        <div class="ar-mobile-cards" id="aw-mobile-cards"></div>
+
+        <div class="empty-state" id="aw-empty-state" hidden>
+          <p>No awarded projects match your search or status filter.</p>
+        </div>
+      </section>
+    </div>
+
+    <!-- ==================================================================== -->
     <!-- TAB 4 PANEL: ACCOUNT RECEIVABLE (DP + PB1–PB10 + FINAL + 2307 + TPC) -->
     <!-- ==================================================================== -->
     <div id="panel-ar" class="tab-panel ar-stack" hidden>
@@ -425,39 +611,148 @@
         </div>
       </section>
     </div>
-  </main>
+
+    <!-- ==================================================================== -->
+    <!-- TAB 5 PANEL: SETTINGS (WORKSPACE, APPS SCRIPT SYNC & DATA BACKUP)    -->
+    <!-- ==================================================================== -->
+    <div id="panel-settings" class="tab-panel settings-stack" hidden>
+      <section class="analytics-card">
+        <div class="analytics-header compact">
+          <div>
+            <h2>Workspace &amp; Company Defaults</h2>
+            <p>Configure default RGE Project Tracker and Account Receivable settings saved to this device.</p>
+          </div>
+          <span class="analytics-pill">RGE PMO v2.0</span>
+        </div>
+
+        <form id="form-settings" class="settings-form-grid">
+          <div class="form-field">
+            <label for="set-company-name">Company Name</label>
+            <input type="text" id="set-company-name" value="RGE Infra &amp; Information Technology Services" />
+          </div>
+          <div class="form-field">
+            <label for="set-hq-address">Office Address</label>
+            <input type="text" id="set-hq-address" value="Unit 210, Don Raul Building, #77 Kamuning Road, Quezon City" />
+          </div>
+          <div class="form-field">
+            <label for="set-default-track">Default Service Track (New Projects)</label>
+            <select id="set-default-track" class="select-control">
+              <option value="supply-delivery">Supply &amp; Delivery</option>
+              <option value="supply-only">Supply only</option>
+              <option value="supply-install" selected>Supply &amp; Install</option>
+              <option value="install-services">Install/Services</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label for="set-default-status">Default Status (New Projects)</label>
+            <select id="set-default-status" class="select-control">
+              <option value="Survey">Survey</option>
+              <option value="Project awarded">Project awarded</option>
+              <option value="On-going project" selected>On-going project</option>
+              <option value="Project completed">Project completed</option>
+              <option value="Hold">Hold</option>
+            </select>
+          </div>
+          <div class="form-field full-span">
+            <label for="set-default-terms">Default AR Payment Terms</label>
+            <input type="text" id="set-default-terms" value="50% DP, 40% Progress Billing, 10% Completion" />
+          </div>
+          <div class="form-field full-span">
+            <label for="set-appscript-url">Google Apps Script Web App URL (Optional Sheets Sync)</label>
+            <input type="url" id="set-appscript-url" placeholder="https://script.google.com/macros/s/.../exec" />
+            <span class="settings-help-text">Paste your deployed Apps Script URL from <code>Appscript/code.gs</code> when ready to connect live Google Sheets sync.</span>
+          </div>
+          <div class="settings-actions-row full-span">
+            <button type="submit" class="btn btn-primary">Save Settings</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="analytics-card">
+        <div class="analytics-header compact">
+          <div>
+            <h2>Data Backup, Export &amp; Maintenance</h2>
+            <p>Download a complete backup of your Projects &amp; Account Receivable (PB1–PB10) records, or restore from JSON.</p>
+          </div>
+        </div>
+
+        <div class="settings-tools-grid">
+          <div class="settings-tool-box">
+            <h3>Full JSON Backup</h3>
+            <p>Exports all tracked projects, checklists, AR records (PB1–PB10), and preferences.</p>
+            <button type="button" class="btn btn-outline btn-sm" id="btn-backup-json">Download Backup (.json)</button>
+          </div>
+          <div class="settings-tool-box">
+            <h3>Restore Backup</h3>
+            <p>Import a previously exported RGE Tracker <code>.json</code> backup file onto this device.</p>
+            <label class="btn btn-outline btn-sm" for="input-restore-json" style="cursor:pointer">Import Backup (.json)</label>
+            <input type="file" id="input-restore-json" accept="application/json" hidden />
+          </div>
+          <div class="settings-tool-box danger-box">
+            <h3>Reset Demo Records</h3>
+            <p>Clears local edits and restores the default seeded RGE projects and AR ledger.</p>
+            <button type="button" class="btn btn-danger-ghost btn-sm" id="btn-settings-reset">Reset All Demo Data</button>
+          </div>
+        </div>
+      </section>
+    </div>
+    </main>
+  </div>
 
   <!-- ====================================================================== -->
-  <!-- OFFICIAL RGE CORPORATE LETTERHEAD FOOTER (Images/RGE Footer.png)       -->
+  <!-- RGE CORPORATE FOOTER (Pure HTML/CSS Matching RGE Letterhead Style)     -->
   <!-- ====================================================================== -->
-  <footer class="corporate-footer" role="contentinfo">
-    <div class="container footer-utility-bar">
-      <div class="footer-quick-links">
-        <a href="mailto:admin@rgeitservices.com">admin@rgeitservices.com</a>
-        <span>&bull;</span>
-        <a href="https://www.rgeinfraitservices.com/" target="_blank" rel="noopener noreferrer">www.rgeinfraitservices.com</a>
-        <span>&bull;</span>
-        <a href="tel:+639176379769">+63 917 637 9769</a>
-        <span>&bull;</span>
-        <a href="tel:+639171803070">+63 917 180 3070</a>
-      </div>
-      <button type="button" class="footer-reset-link" id="btn-reset-demo">Reset Demo Data</button>
+  <footer class="corporate-footer rge-lh-footer" role="contentinfo">
+    <!-- Mirrored Signature Top Accent Bar (Deep Navy -> Cerulean Slash -> Charcoal) -->
+    <div class="rge-lh-footer-top-bar" aria-hidden="true">
+      <div class="rge-fbar-navy"></div>
+      <div class="rge-fbar-slash"></div>
+      <div class="rge-fbar-gray"></div>
     </div>
 
-    <div class="letterhead-footer-shell">
-      <div class="container letterhead-container">
-        <img
-          src="Images/RGE Footer.png"
-          alt="RGE Infra &amp; Information Technology Services — admin@rgeitservices.com, www.rgeinfraitservices.com, +63 917 637 9769, +63 917 180 3070"
-          class="letterhead-img"
-        />
+    <div class="rge-lh-footer-body">
+      <div class="rge-lh-footer-slashes" aria-hidden="true"></div>
+      <div class="rge-lh-footer-inner">
+        <div class="rge-foot-col rge-foot-social">
+          <span class="rge-foot-fb-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.04c-5.5 0-10 4.49-10 10.02 0 5 3.66 9.15 8.44 9.9v-7H7.9v-2.9h2.54V9.85c0-2.51 1.49-3.89 3.78-3.89 1.09 0 2.23.19 2.23.19v2.47h-1.26c-1.24 0-1.63.77-1.63 1.56v1.88h2.78l-.45 2.9h-2.33v7a10 10 0 0 0 8.44-9.9c0-5.53-4.5-10.02-10-10.02z"/></svg>
+          </span>
+          <div class="rge-foot-company">
+            <span>RGE Infra &amp; Information</span>
+            <span>Technology Services</span>
+          </div>
+        </div>
+
+        <div class="rge-foot-col rge-foot-web">
+          <a href="mailto:admin@rgeitservices.com" class="rge-foot-link">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/></svg>
+            <span>admin@rgeitservices.com</span>
+          </a>
+          <a href="https://www.rgeinfraitservices.com/" target="_blank" rel="noopener noreferrer" class="rge-foot-link">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            <span>www.rgeinfraitservices.com</span>
+          </a>
+        </div>
+
+        <div class="rge-foot-col rge-foot-phones">
+          <svg class="rge-foot-phone-ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C10.61 21 3 13.39 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.46.57 3.58a1 1 0 0 1-.25 1.01l-2.2 2.2z"/></svg>
+          <div class="rge-foot-phone-list">
+            <a href="tel:+639176379769">+63 917 637 9769</a>
+            <a href="tel:+639171803070">+63 917 180 3070</a>
+          </div>
+          <button type="button" class="footer-reset-link rge-foot-reset" id="btn-reset-demo">Reset Demo</button>
+        </div>
       </div>
     </div>
   </footer>
 
-  <!-- Mobile Sticky Bottom Action Bar (Thumb-Zone Ergonomics) -->
+  <!-- Mobile Sticky Bottom Action Bar (Exact Sequence Match) -->
   <nav class="mobile-bottom-bar cols-5-bar" aria-label="Mobile quick actions">
-    <button class="mob-bar-btn is-active" id="mob-tab-tracks" data-mob-main-tab="tracks" type="button">
+    <button class="mob-bar-btn is-active" id="mob-tab-overview" data-mob-main-tab="overview" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+      <span>Overview</span>
+    </button>
+    <button class="mob-bar-btn" id="mob-tab-tracks" data-mob-main-tab="tracks" type="button">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
       <span>Tracks</span>
     </button>
@@ -465,17 +760,13 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
       <span>Status</span>
     </button>
-    <button class="mob-bar-btn" id="mob-tab-overview" data-mob-main-tab="overview" type="button">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
-      <span>Overview</span>
+    <button class="mob-bar-btn" id="mob-tab-awarded" data-mob-main-tab="awarded" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+      <span>Awarded</span>
     </button>
     <button class="mob-bar-btn" id="mob-tab-ar" data-mob-main-tab="ar" type="button">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
       <span>AR</span>
-    </button>
-    <button class="mob-bar-btn mob-bar-add" id="mob-btn-add" type="button">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      <span>Add</span>
     </button>
   </nav>
 
@@ -631,10 +922,36 @@
     </div>
   </aside>
 
+  <!-- ====================================================================== -->
+  <!-- SLIDE-OVER PROJECT AWARDED EDITOR DRAWER (+ OPEN IN AR LEDGER BRIDGE)  -->
+  <!-- ====================================================================== -->
+  <div class="drawer-backdrop" id="aw-drawer-backdrop" aria-hidden="true"></div>
+  <aside class="detail-drawer ar-drawer-wide" id="aw-drawer" role="dialog" aria-modal="true" aria-labelledby="aw-drawer-title" aria-hidden="true">
+    <div class="detail-header">
+      <div>
+        <span class="detail-code" id="aw-drawer-code">RGE-TRK-001</span>
+        <h2 class="detail-title" id="aw-drawer-title">Project Awarded Details</h2>
+      </div>
+      <button class="close-icon-btn" id="aw-btn-close-drawer" type="button" aria-label="Close Project Awarded editor">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div class="detail-body" id="aw-drawer-body"></div>
+
+    <div class="detail-footer">
+      <button class="btn btn-outline" id="aw-btn-open-ar" type="button">Open in AR Ledger &rarr;</button>
+      <div class="detail-footer-right">
+        <button class="btn btn-primary" id="aw-btn-save-drawer" type="button">Save Changes</button>
+      </div>
+    </div>
+  </aside>
+
   <div class="toast-stack" id="toast-stack" aria-live="polite"></div>
 
   <script src="data.js"></script>
   <script src="ar.js"></script>
+  <script src="awarded.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

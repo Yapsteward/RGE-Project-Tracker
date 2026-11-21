@@ -11,7 +11,7 @@
    ========================================================================== */
 
 window.RGE_AR_MODULE = (() => {
-  const AR_STORAGE_KEY = "rge_project_tracker_ar_v1";
+  const AR_STORAGE_KEY = "rge_project_tracker_ar_v2";
   const PB_COUNT = 10;
 
   function makeEmptyPBs(prefill = {}) {
@@ -29,13 +29,13 @@ window.RGE_AR_MODULE = (() => {
     return pbs;
   }
 
-  /* Seeded AR Records (Starts with the exact example from user's screenshot + RGE Infra records) */
+  /* 5 Clean Sample AR Records matching the 5 sample projects */
   const INITIAL_AR_RECORDS = [
     {
       id: "AR-2026-001",
       projectTitle: "Supply & installation of CCTV Cameras (24units)",
       client: "ABC Company",
-      endUser: "Jaquar",
+      endUser: "Jaguar",
       projectSite: "Makati",
       poNo: "PO-2026-1001",
       poAmount: 100000,
@@ -51,111 +51,34 @@ window.RGE_AR_MODULE = (() => {
       finalDate: "",
       finalSiNo: "",
       finalSiDate: "",
-      ewt2307: 700, // Manual 2307 withholding tax input (1% example)
+      ewt2307: 700,
       terms: "50% DP, 40% Progress Billing, 10% Completion",
       tpcCost: 68500
     },
     {
       id: "AR-2026-002",
-      projectTitle: "Commonwealth Ave. Smart Traffic & AI CCTV Grid",
-      client: "Quezon City DPOS",
-      endUser: "Quezon City Government",
-      projectSite: "Commonwealth Ave., Quezon City",
-      poNo: "PO-2026-4012",
-      poAmount: 54200000,
-      poDate: "2026-01-12",
-      dpAmount: 16260000,
-      dpDate: "2026-01-25",
-      dpSiNo: "SI-2026-0104",
-      dpSiDate: "2026-01-24",
-      pbs: makeEmptyPBs({
-        1: { amount: 10840000, date: "2026-04-15", siNo: "SI-2026-0188", siDate: "2026-04-12" },
-        2: { amount: 10840000, date: "2026-07-22", siNo: "SI-2026-0265", siDate: "2026-07-19" },
-        3: { amount: 5420000, date: "2026-10-10", siNo: "SI-2026-0340", siDate: "2026-10-08" }
-      }),
-      finalAmount: 0,
-      finalDate: "",
-      finalSiNo: "",
-      finalSiDate: "",
-      ewt2307: 433600,
-      terms: "30% DP, 60% Progress Billing (PB1–PB4), 10% Retention",
-      tpcCost: 39800000
-    },
-    {
-      id: "AR-2026-003",
-      projectTitle: "BGC Corporate Tower Core Switching & Wi-Fi 6E",
-      client: "Ayala Triangle Enterprise Group",
-      endUser: "MetroPrime Holdings",
-      projectSite: "BGC, Taguig City",
-      poNo: "PO-2026-4118",
-      poAmount: 41500000,
-      poDate: "2025-11-10",
-      dpAmount: 20750000,
-      dpDate: "2025-11-20",
-      dpSiNo: "SI-2025-0910",
-      dpSiDate: "2025-11-18",
-      pbs: makeEmptyPBs({
-        1: { amount: 12450000, date: "2026-03-14", siNo: "SI-2026-0155", siDate: "2026-03-11" },
-        2: { amount: 7470000, date: "2026-08-19", siNo: "SI-2026-0299", siDate: "2026-08-15" }
-      }),
-      finalAmount: 0,
-      finalDate: "",
-      finalSiNo: "",
-      finalSiDate: "",
-      ewt2307: 406700,
-      terms: "50% DP, 40% Progress Billing, 10% Final Acceptance",
-      tpcCost: 29400000
-    },
-    {
-      id: "AR-2026-004",
-      projectTitle: "NCR Emergency Ops Center 14m Fine-Pitch LED Wall",
-      client: "Metro Manila DRRMO",
-      endUser: "MMDA Operations Command",
-      projectSite: "Quezon City",
-      poNo: "PO-2026-3890",
-      poAmount: 29400000,
-      poDate: "2025-08-20",
-      dpAmount: 14700000,
-      dpDate: "2025-09-02",
-      dpSiNo: "SI-2025-0744",
-      dpSiDate: "2025-09-01",
-      pbs: makeEmptyPBs({
-        1: { amount: 8820000, date: "2026-01-18", siNo: "SI-2026-0092", siDate: "2026-01-15" }
-      }),
-      finalAmount: 5586000,
-      finalDate: "2026-09-30",
-      finalSiNo: "SI-2026-0321",
-      finalSiDate: "2026-09-28",
-      ewt2307: 294000,
-      terms: "50% DP, 30% Delivery PB1, 20% Commissioning",
-      tpcCost: 21150000
-    },
-    {
-      id: "AR-2026-005",
       projectTitle: "QC District 4 144-Core ADSS Fiber Drums & Closures",
       client: "Quezon City Engineering Office",
       endUser: "QC IT Development Office",
-      projectSite: "Kamuning & District 4, QC",
+      projectSite: "Kamuning, Quezon City",
       poNo: "PO-2026-4410",
       poAmount: 14800000,
-      poDate: "2026-08-05",
+      poDate: "2026-10-15",
       dpAmount: 7400000,
-      dpDate: "2026-08-18",
+      dpDate: "2026-10-22",
       dpSiNo: "SI-2026-0290",
-      dpSiDate: "2026-08-16",
-      pbs: makeEmptyPBs({
-        1: { amount: 3700000, date: "2026-10-22", siNo: "SI-2026-0364", siDate: "2026-10-20" }
-      }),
+      dpSiDate: "2026-10-20",
+      pbs: makeEmptyPBs(),
       finalAmount: 0,
       finalDate: "",
       finalSiNo: "",
       finalSiDate: "",
-      ewt2307: 111000,
+      ewt2307: 74000,
       terms: "50% DP, 25% Batch 1 Delivery, 25% Final Delivery",
       tpcCost: 10900000
     },
     {
-      id: "AR-2026-006",
+      id: "AR-2026-003",
       projectTitle: "Cat6A Shielded Boxes, Patch Panels & OM4 Trunks",
       client: "MetroPrime Financial Holdings",
       endUser: "MetroPrime BGC Tower",
@@ -177,29 +100,50 @@ window.RGE_AR_MODULE = (() => {
       tpcCost: 5120000
     },
     {
-      id: "AR-2026-007",
-      projectTitle: "Ortigas BPO Tower 18-Floor Cat6A Cabling Labor",
-      client: "GlobalDesk BPO Solutions",
-      endUser: "GlobalDesk PH Operations",
-      projectSite: "Ortigas Center, Pasig City",
-      poNo: "PO-2026-4220",
-      poAmount: 14500000,
-      poDate: "2026-05-01",
-      dpAmount: 4350000,
-      dpDate: "2026-05-12",
-      dpSiNo: "SI-2026-0210",
-      dpSiDate: "2026-05-10",
+      id: "AR-2026-004",
+      projectTitle: "Clark Data Center Zero-Downtime Rack Migration",
+      client: "Luzon Cloud Colocation Inc.",
+      endUser: "Luzon Cloud Operations",
+      projectSite: "Clark Global City, Pampanga",
+      poNo: "PO-2026-4542",
+      poAmount: 11600000,
+      poDate: "2026-11-12",
+      dpAmount: 0,
+      dpDate: "",
+      dpSiNo: "",
+      dpSiDate: "",
+      pbs: makeEmptyPBs(),
+      finalAmount: 0,
+      finalDate: "",
+      finalSiNo: "",
+      finalSiDate: "",
+      ewt2307: 0,
+      terms: "30% DP, 50% Cutover Completion, 20% UAT Sign-off",
+      tpcCost: 8100000
+    },
+    {
+      id: "AR-2026-005",
+      projectTitle: "Mindanao Agro-Hub Telecom Towers & Solar Shelters",
+      client: "Mindanao Shared Tower Co.",
+      endUser: "Regional Carrier Consortium",
+      projectSite: "Davao del Norte",
+      poNo: "PO-2026-4288",
+      poAmount: 31200000,
+      poDate: "2026-06-20",
+      dpAmount: 6240000,
+      dpDate: "2026-07-02",
+      dpSiNo: "SI-2026-0225",
+      dpSiDate: "2026-07-01",
       pbs: makeEmptyPBs({
-        1: { amount: 2900000, date: "2026-07-04", siNo: "SI-2026-0244", siDate: "2026-07-02" },
-        2: { amount: 2900000, date: "2026-09-10", siNo: "SI-2026-0315", siDate: "2026-09-08" }
+        1: { amount: 4680000, date: "2026-09-14", siNo: "SI-2026-0310", siDate: "2026-09-12" }
       }),
       finalAmount: 0,
       finalDate: "",
       finalSiNo: "",
       finalSiDate: "",
-      ewt2307: 203000,
-      terms: "30% DP, 60% Monthly Progress Billing, 10% Fluke Sign-off",
-      tpcCost: 9850000
+      ewt2307: 109200,
+      terms: "20% DP, 70% Site Progress Billing, 10% Retention",
+      tpcCost: 22400000
     }
   ];
 
@@ -973,6 +917,55 @@ window.RGE_AR_MODULE = (() => {
     toast(`Exported ${rows.length} AR records (with all PB1–PB10 columns) to CSV.`);
   }
 
+  function openOrCreateFromAwarded(proj) {
+    if (!dom.tableEl) cacheDOM();
+    const poClean = (proj.po || "").trim().toLowerCase();
+    const titleClean = (proj.name || "").trim().toLowerCase();
+
+    const match = arState.records.find(
+      (r) =>
+        (poClean && (r.poNo || "").trim().toLowerCase() === poClean) ||
+        (titleClean && (r.projectTitle || "").trim().toLowerCase() === titleClean)
+    );
+
+    if (match) {
+      renderAR();
+      openARDrawer(match.id);
+      toast(`Opened existing AR Ledger record (${match.poNo || match.id}).`);
+      return;
+    }
+
+    // Auto-create AR record directly from the unified Project Awarded object (zero double entry!)
+    const newAR = {
+      id: `AR-2026-${String(arState.records.length + 1).padStart(3, "0")}`,
+      projectTitle: proj.name || "",
+      client: proj.client || "",
+      endUser: proj.endUser || proj.client || "",
+      projectSite: proj.location || "",
+      poNo: proj.po || "",
+      poAmount: Number(proj.value) || 0,
+      poDate: proj.poDate || new Date().toISOString().slice(0, 10),
+      dpAmount: 0,
+      dpDate: "",
+      dpSiNo: "",
+      dpSiDate: "",
+      pbs: makeEmptyPBs(),
+      finalAmount: 0,
+      finalDate: "",
+      finalSiNo: "",
+      finalSiDate: "",
+      ewt2307: 0,
+      terms: "50% DP, 40% Progress Billing, 10% Completion",
+      tpcCost: Number(proj.workingBudget) || 0
+    };
+
+    arState.records.unshift(newAR);
+    saveAR();
+    renderAR();
+    openARDrawer(newAR.id);
+    toast(`Created & synced AR record ${newAR.id} from "${proj.po || proj.id}".`);
+  }
+
   function resetDemoAR() {
     localStorage.removeItem(AR_STORAGE_KEY);
     arState.records = structuredClone(INITIAL_AR_RECORDS);
@@ -1040,5 +1033,5 @@ window.RGE_AR_MODULE = (() => {
     renderAR();
   }
 
-  return { init, renderAR, openARDrawer, resetDemoAR };
+  return { init, renderAR, openARDrawer, openOrCreateFromAwarded, resetDemoAR };
 })();
