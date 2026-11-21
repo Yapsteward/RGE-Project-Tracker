@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>RGE Project Tracker — Infra &amp; Information Technology Services</title>
+  <meta name="description" content="RGE Infra &amp; Information Technology Services Project Tracker across Service Tracks, Project Status Board, and Executive Status Distribution Analytics." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <a href="#main-workspace" class="skip-link">Skip to Project Tracker</a>
+
+  <!-- ====================================================================== -->
+  <!-- OFFICIAL RGE CORPORATE LETTERHEAD HEADER (Images/RGE Header.png)       -->
+  <!-- ====================================================================== -->
+  <header class="corporate-header" role="banner">
+    <div class="letterhead-shell">
+      <div class="container letterhead-container">
+        <img
+          src="Images/RGE Header.png"
+          alt="RGE Infra &amp; Information Technology Services — Unit 210, Don Raul Building, #77 Kamuning Road, Quezon City"
+          class="letterhead-img"
+        />
+      </div>
+    </div>
+
+    <!-- Sticky App Command Bar -->
+    <div class="app-command-bar">
+      <div class="container command-inner">
+        <div class="command-title-group">
+          <div class="rge-signal-dots" aria-hidden="true">
+            <span class="sig-dot lg"></span>
+            <span class="sig-dot md"></span>
+            <span class="sig-dot sm"></span>
+          </div>
+          <div>
+            <h1 class="app-title">RGE PROJECT TRACKER</h1>
+            <span class="app-subtitle" id="live-sync-label">Live PMO Workspace &bull; Desktop &amp; Mobile</span>
+          </div>
+        </div>
+
+        <div class="command-actions">
+          <div class="view-switcher" id="board-list-switcher" role="group" aria-label="Board or List layout">
+            <button class="view-tab is-active" id="btn-mode-board" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="5" height="18" rx="1"/><rect x="10" y="3" width="5" height="12" rx="1"/><rect x="17" y="3" width="4" height="15" rx="1"/></svg>
+              <span>Columns</span>
+            </button>
+            <button class="view-tab" id="btn-mode-table" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+              <span>List</span>
+            </button>
+          </div>
+
+          <button class="cmd-btn cmd-btn-ghost hide-sm" id="btn-print-report" type="button" title="Print / Save PDF with RGE Header &amp; Footer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            <span>Print</span>
+          </button>
+
+          <button class="cmd-btn cmd-btn-ghost hide-sm" id="btn-export-csv" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span>Export CSV</span>
+          </button>
+
+          <button class="cmd-btn cmd-btn-accent" id="btn-new-project" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>New Project</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================================================================== -->
+    <!-- NEW PRIMARY TAB BAR (3 WORKSPACE TABS)                               -->
+    <!--   Tab 1: Service Tracks (Supply & Delivery, Supply only, etc.)       -->
+    <!--   Tab 2: Project Status Board (Survey, Awarded, On-going, Completed, Hold) -->
+    <!--   Tab 3: Project Status Overview & Distribution                      -->
+    <!-- ==================================================================== -->
+    <nav class="primary-tab-bar" aria-label="Workspace tabs">
+      <div class="container tab-bar-inner" role="tablist">
+        <button class="primary-tab is-active" id="tab-btn-tracks" data-main-tab="tracks" role="tab" aria-selected="true" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+          <span>Service Tracks</span>
+          <span class="tab-pill-badge" id="tab-badge-tracks">4 cols</span>
+        </button>
+
+        <button class="primary-tab" id="tab-btn-status" data-main-tab="status" role="tab" aria-selected="false" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          <span>Project Status Board</span>
+          <span class="tab-pill-badge" id="tab-badge-status">5 cols</span>
+        </button>
+
+        <button class="primary-tab" id="tab-btn-overview" data-main-tab="overview" role="tab" aria-selected="false" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+          <span>Project Status Overview &amp; Distribution</span>
+          <span class="tab-pill-badge badge-analytics">Analytics</span>
+        </button>
+
+        <button class="primary-tab" id="tab-btn-ar" data-main-tab="ar" role="tab" aria-selected="false" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/><line x1="6" y1="15" x2="10" y2="15"/></svg>
+          <span>Account Receivable</span>
+          <span class="tab-pill-badge badge-ar" id="tab-badge-ar">7 AR</span>
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <!-- ====================================================================== -->
+  <!-- MAIN WORKSPACE                                                         -->
+  <!-- ====================================================================== -->
+  <main id="main-workspace" class="tracker-main container">
+    <!-- Top Executive KPI Summary Strip (Always synced across all tabs) -->
+    <section class="kpi-strip" aria-label="Portfolio Metrics">
+      <article class="kpi-card">
+        <div class="kpi-top">
+          <span class="kpi-label">Total Projects</span>
+          <span class="kpi-icon icon-navy" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          </span>
+        </div>
+        <div class="kpi-value" id="kpi-total-count">0</div>
+        <div class="kpi-sub" id="kpi-total-sub">Across all tracks &amp; statuses</div>
+      </article>
+
+      <article class="kpi-card">
+        <div class="kpi-top">
+          <span class="kpi-label">Total Contract Value</span>
+          <span class="kpi-icon icon-blue" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </span>
+        </div>
+        <div class="kpi-value kpi-mono" id="kpi-total-value">&#8369; 0</div>
+        <div class="kpi-sub" id="kpi-billed-sub">&#8369; 0 billed (0%)</div>
+      </article>
+
+      <article class="kpi-card">
+        <div class="kpi-top">
+          <span class="kpi-label">On-going &amp; Active</span>
+          <span class="kpi-icon icon-teal" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </span>
+        </div>
+        <div class="kpi-value" id="kpi-active-count">0</div>
+        <div class="kpi-sub" id="kpi-avg-progress">0% average completion</div>
+      </article>
+
+      <article class="kpi-card">
+        <div class="kpi-top">
+          <span class="kpi-label">Project Completed</span>
+          <span class="kpi-icon icon-green" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </span>
+        </div>
+        <div class="kpi-value" id="kpi-completed-count">0</div>
+        <div class="kpi-sub" id="kpi-completed-rate">0% completion rate</div>
+      </article>
+    </section>
+
+    <!-- Search, Filter & Sort Toolbar (Shared across Tabs 1 & 2) -->
+    <section class="filter-toolbar" id="shared-filter-toolbar" aria-label="Search and filter projects">
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="search" id="input-search" class="search-input" placeholder="Search code, project name, client, PO#, location, or PM..." aria-label="Search projects" />
+      </div>
+
+      <div class="status-pills" id="status-filter-pills" role="group" aria-label="Filter by project status">
+        <button class="status-chip is-active" data-status="all" type="button">All Status</button>
+        <button class="status-chip" data-status="Survey" type="button">Survey</button>
+        <button class="status-chip" data-status="Project awarded" type="button">Project awarded</button>
+        <button class="status-chip" data-status="On-going project" type="button">On-going project</button>
+        <button class="status-chip" data-status="Project completed" type="button">Project completed</button>
+        <button class="status-chip" data-status="Hold" type="button">Hold</button>
+      </div>
+
+      <div class="toolbar-right">
+        <label for="select-priority-filter" class="sr-only">Filter by Priority</label>
+        <select id="select-priority-filter" class="select-control">
+          <option value="all">All Priorities</option>
+          <option value="High">High Priority</option>
+          <option value="Normal">Normal Priority</option>
+          <option value="Low">Low Priority</option>
+        </select>
+
+        <label for="select-sort" class="sr-only">Sort projects</label>
+        <select id="select-sort" class="select-control">
+          <option value="due-asc">Due Date (Soonest)</option>
+          <option value="value-desc">Highest Value (&#8369;)</option>
+          <option value="progress-desc">Highest Progress (%)</option>
+          <option value="name-asc">Project Name (A–Z)</option>
+        </select>
+      </div>
+    </section>
+
+    <!-- ==================================================================== -->
+    <!-- TAB 1 PANEL: SERVICE TRACKS (4 COLUMNS: Supply & Delivery, etc.)     -->
+    <!-- ==================================================================== -->
+    <div id="panel-tracks" class="tab-panel">
+      <!-- Mobile Column Switcher Strip (< 1080px) -->
+      <nav class="mobile-column-tabs" id="mobile-column-tabs" aria-label="Select service track column on mobile"></nav>
+
+      <!-- 4-Column Interactive Kanban Board -->
+      <section class="kanban-board cols-4" id="kanban-board" aria-label="Service Tracks 4-Column Board"></section>
+    </div>
+
+    <!-- ==================================================================== -->
+    <!-- TAB 2 PANEL: PROJECT STATUS BOARD (5 COLUMNS)                        -->
+    <!--   Survey | Project awarded | On-going project | Project completed | Hold -->
+    <!-- ==================================================================== -->
+    <div id="panel-status" class="tab-panel" hidden>
+      <!-- Mobile Status Column Switcher Strip (< 1220px) -->
+      <nav class="mobile-column-tabs" id="mobile-status-tabs" aria-label="Select project status column on mobile"></nav>
+
+      <!-- 5-Column Interactive Status Kanban Board -->
+      <section class="kanban-board cols-5" id="status-kanban-board" aria-label="Project Status 5-Column Board"></section>
+    </div>
+
+    <!-- ==================================================================== -->
+    <!-- SHARED MASTER TABLE VIEW (When user clicks 'List' in Tab 1 or Tab 2) -->
+    <!-- ==================================================================== -->
+    <section class="master-table-card" id="master-table-section" aria-label="Master Project List" hidden>
+      <div class="table-header-bar">
+        <div>
+          <h2>Master Project List</h2>
+          <p id="table-summary-text">Showing all tracked projects</p>
+        </div>
+        <div class="column-filter-mini" id="table-column-filter">
+          <button class="mini-col-btn is-active" data-col="all" type="button">All Tracks</button>
+          <button class="mini-col-btn" data-col="supply-delivery" type="button">Supply &amp; Delivery</button>
+          <button class="mini-col-btn" data-col="supply-only" type="button">Supply only</button>
+          <button class="mini-col-btn" data-col="supply-install" type="button">Supply &amp; Install</button>
+          <button class="mini-col-btn" data-col="install-services" type="button">Install/Services</button>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="tracker-table">
+          <thead>
+            <tr>
+              <th>Code / PO</th>
+              <th>Project &amp; Client</th>
+              <th>Service Track</th>
+              <th>Location</th>
+              <th>Project Status</th>
+              <th>Progress</th>
+              <th>Target Date</th>
+              <th class="text-right">Contract Value</th>
+            </tr>
+          </thead>
+          <tbody id="master-table-body"></tbody>
+        </table>
+      </div>
+
+      <div class="empty-state" id="table-empty-state" hidden>
+        <p>No projects match your current search or filters.</p>
+        <button class="btn btn-primary btn-sm" id="btn-reset-filters-empty" type="button">Clear Filters</button>
+      </div>
+    </section>
+
+    <!-- ==================================================================== -->
+    <!-- TAB 3 PANEL: PROJECT STATUS OVERVIEW & PROJECT STATUS DISTRIBUTION   -->
+    <!-- ==================================================================== -->
+    <div id="panel-overview" class="tab-panel analytics-stack" hidden>
+      <!-- SECTION A: PROJECT STATUS OVERVIEW -->
+      <section class="analytics-card" aria-labelledby="heading-status-overview">
+        <div class="analytics-header">
+          <div>
+            <h2 id="heading-status-overview">Project Status Overview</h2>
+            <p>Live count, contract value, billing progress, and share across all 5 RGE project statuses. Click any card to view its projects.</p>
+          </div>
+          <span class="analytics-pill" id="overview-total-pill">20 Projects Tracked</span>
+        </div>
+
+        <div class="status-overview-grid" id="status-overview-grid">
+          <!-- Populated dynamically by app.js -->
+        </div>
+      </section>
+
+      <!-- SECTION B: PROJECT STATUS DISTRIBUTION (Charts) -->
+      <section class="distribution-two-col" aria-label="Project Status Distribution Charts">
+        <!-- Interactive Donut Distribution Chart -->
+        <article class="analytics-card">
+          <div class="analytics-header compact">
+            <div>
+              <h2>Project Status Distribution</h2>
+              <p>Percentage share of projects across Survey, Awarded, On-going, Completed, and Hold.</p>
+            </div>
+          </div>
+
+          <div class="donut-layout">
+            <div class="donut-stage" id="status-donut-container">
+              <!-- Custom responsive SVG Donut rendered by app.js -->
+            </div>
+            <div class="donut-legend" id="status-donut-legend">
+              <!-- Populated dynamically by app.js -->
+            </div>
+          </div>
+        </article>
+
+        <!-- Contract Value Distribution by Status -->
+        <article class="analytics-card">
+          <div class="analytics-header compact">
+            <div>
+              <h2>Contract Value &amp; Billing by Status</h2>
+              <p>Total approved contract value (&#8369;) vs. billed accomplishment per lifecycle stage.</p>
+            </div>
+          </div>
+
+          <div class="value-dist-list" id="status-value-bars">
+            <!-- Populated dynamically by app.js -->
+          </div>
+        </article>
+      </section>
+
+      <!-- SECTION C: SERVICE TRACK x PROJECT STATUS CROSS-MATRIX -->
+      <section class="analytics-card" aria-labelledby="heading-cross-matrix">
+        <div class="analytics-header compact">
+          <div>
+            <h2 id="heading-cross-matrix">Service Track &times; Project Status Matrix</h2>
+            <p>Distribution of projects and contract value across your 4 Service Tracks and 5 Status Columns.</p>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="matrix-table" id="cross-matrix-table">
+            <!-- Populated dynamically by app.js -->
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <!-- ==================================================================== -->
+    <!-- TAB 4 PANEL: ACCOUNT RECEIVABLE (DP + PB1–PB10 + FINAL + 2307 + TPC) -->
+    <!-- ==================================================================== -->
+    <div id="panel-ar" class="tab-panel ar-stack" hidden>
+      <!-- AR KPI Summary Strip -->
+      <section class="kpi-strip" aria-label="Account Receivable Summary">
+        <article class="kpi-card">
+          <div class="kpi-top">
+            <span class="kpi-label">Total P.O Amount</span>
+            <span class="kpi-icon icon-navy" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>
+          </div>
+          <div class="kpi-value kpi-mono" id="ar-kpi-po">&#8369; 0</div>
+          <div class="kpi-sub">Approved Purchase Orders</div>
+        </article>
+
+        <article class="kpi-card">
+          <div class="kpi-top">
+            <span class="kpi-label">Total Payment Received</span>
+            <span class="kpi-icon icon-green" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span>
+          </div>
+          <div class="kpi-value kpi-mono" id="ar-kpi-received">&#8369; 0</div>
+          <div class="kpi-sub" id="ar-kpi-received-pct">0% collected incl. 2307</div>
+        </article>
+
+        <article class="kpi-card">
+          <div class="kpi-top">
+            <span class="kpi-label">Account Receivable (Balance)</span>
+            <span class="kpi-icon icon-blue" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></span>
+          </div>
+          <div class="kpi-value kpi-mono" id="ar-kpi-balance" style="color:#B45309">&#8369; 0</div>
+          <div class="kpi-sub" id="ar-kpi-balance-sub">Balance to pay from clients</div>
+        </article>
+
+        <article class="kpi-card">
+          <div class="kpi-top">
+            <span class="kpi-label">2307 W/Holding Tax</span>
+            <span class="kpi-icon icon-teal" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>
+          </div>
+          <div class="kpi-value kpi-mono" id="ar-kpi-ewt-tpc">&#8369; 0</div>
+          <div class="kpi-sub" id="ar-kpi-tpc-sub">TPC Cost: &#8369; 0</div>
+        </article>
+      </section>
+
+      <!-- AR Controls & Toolbar -->
+      <section class="filter-toolbar ar-toolbar" aria-label="Account Receivable Filters">
+        <div class="search-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="search" id="ar-search-input" class="search-input" placeholder="Search project title, client, end user, site, P.O#, or Sales Invoice #..." aria-label="Search Account Receivable records" />
+        </div>
+
+        <div class="status-pills" id="ar-remarks-pills" role="group" aria-label="Filter by Payment Remarks">
+          <button class="status-chip is-active" data-ar-remark="all" type="button">All Remarks</button>
+          <button class="status-chip" data-ar-remark="For Billing" type="button">For Billing</button>
+          <button class="status-chip" data-ar-remark="Good as Fully Paid" type="button">Good as Fully Paid</button>
+          <button class="status-chip" data-ar-remark="Fully Paid" type="button">Fully Paid</button>
+        </div>
+
+        <div class="toolbar-right">
+          <div class="ar-pb-toggle" role="group" aria-label="Progress Billing columns toggle">
+            <button type="button" class="mini-col-btn is-active" id="ar-btn-pb-active">PB1–PB3</button>
+            <button type="button" class="mini-col-btn" id="ar-btn-pb-all">All PB1–PB10</button>
+          </div>
+          <button type="button" class="btn btn-outline btn-sm" id="ar-btn-export-csv">Export AR CSV</button>
+          <button type="button" class="btn btn-primary btn-sm" id="ar-btn-add">+ Add AR Record</button>
+        </div>
+      </section>
+
+      <!-- Color-Coded AR Ledger Table (Desktop & Tablet) -->
+      <section class="analytics-card ar-table-card">
+        <div class="analytics-header compact">
+          <div>
+            <h2>Account Receivable Ledger</h2>
+            <p>Click any row to edit Down Payment, Progress Billing 1–10 (PB1–PB10), Final Payment, manual 2307 tax, and TPC Cost with instant auto-calculation.</p>
+          </div>
+          <div class="ar-color-legend" aria-hidden="true">
+            <span><i style="background:#002060"></i>P.O Info</span>
+            <span><i style="background:#68D37E"></i>Down Payment</span>
+            <span><i style="background:#DA96DE"></i>PB1–PB10</span>
+            <span><i style="background:#EB9E71"></i>Final Payment</span>
+            <span><i style="background:#4FC3F7"></i>Receivables</span>
+          </div>
+        </div>
+
+        <div class="ar-table-scroll">
+          <table class="ar-ledger-table" id="ar-ledger-table"></table>
+        </div>
+
+        <!-- Mobile AR Cards View (< 768px) -->
+        <div class="ar-mobile-cards" id="ar-mobile-cards"></div>
+
+        <div class="empty-state" id="ar-empty-state" hidden>
+          <p>No Account Receivable records match your search or filter.</p>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- ====================================================================== -->
+  <!-- OFFICIAL RGE CORPORATE LETTERHEAD FOOTER (Images/RGE Footer.png)       -->
+  <!-- ====================================================================== -->
+  <footer class="corporate-footer" role="contentinfo">
+    <div class="container footer-utility-bar">
+      <div class="footer-quick-links">
+        <a href="mailto:admin@rgeitservices.com">admin@rgeitservices.com</a>
+        <span>&bull;</span>
+        <a href="https://www.rgeinfraitservices.com/" target="_blank" rel="noopener noreferrer">www.rgeinfraitservices.com</a>
+        <span>&bull;</span>
+        <a href="tel:+639176379769">+63 917 637 9769</a>
+        <span>&bull;</span>
+        <a href="tel:+639171803070">+63 917 180 3070</a>
+      </div>
+      <button type="button" class="footer-reset-link" id="btn-reset-demo">Reset Demo Data</button>
+    </div>
+
+    <div class="letterhead-footer-shell">
+      <div class="container letterhead-container">
+        <img
+          src="Images/RGE Footer.png"
+          alt="RGE Infra &amp; Information Technology Services — admin@rgeitservices.com, www.rgeinfraitservices.com, +63 917 637 9769, +63 917 180 3070"
+          class="letterhead-img"
+        />
+      </div>
+    </div>
+  </footer>
+
+  <!-- Mobile Sticky Bottom Action Bar (Thumb-Zone Ergonomics) -->
+  <nav class="mobile-bottom-bar cols-5-bar" aria-label="Mobile quick actions">
+    <button class="mob-bar-btn is-active" id="mob-tab-tracks" data-mob-main-tab="tracks" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+      <span>Tracks</span>
+    </button>
+    <button class="mob-bar-btn" id="mob-tab-status" data-mob-main-tab="status" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      <span>Status</span>
+    </button>
+    <button class="mob-bar-btn" id="mob-tab-overview" data-mob-main-tab="overview" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+      <span>Overview</span>
+    </button>
+    <button class="mob-bar-btn" id="mob-tab-ar" data-mob-main-tab="ar" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+      <span>AR</span>
+    </button>
+    <button class="mob-bar-btn mob-bar-add" id="mob-btn-add" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <span>Add</span>
+    </button>
+  </nav>
+
+  <!-- ====================================================================== -->
+  <!-- SLIDE-OVER PROJECT DETAIL & LIVE EDITOR DRAWER                         -->
+  <!-- ====================================================================== -->
+  <div class="drawer-backdrop" id="detail-backdrop" aria-hidden="true"></div>
+  <aside class="detail-drawer" id="detail-drawer" role="dialog" aria-modal="true" aria-labelledby="detail-title" aria-hidden="true">
+    <div class="detail-header">
+      <div>
+        <span class="detail-code" id="detail-code">RGE-TRK-001</span>
+        <h2 class="detail-title" id="detail-title">Project Title</h2>
+      </div>
+      <button class="close-icon-btn" id="btn-close-detail" type="button" aria-label="Close project details">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div class="detail-body" id="detail-body"></div>
+
+    <div class="detail-footer">
+      <button class="btn btn-danger-ghost" id="btn-delete-project" type="button">Delete</button>
+      <div class="detail-footer-right">
+        <button class="btn btn-outline" id="btn-download-brief" type="button">Brief (.txt)</button>
+        <button class="btn btn-primary" id="btn-done-detail" type="button">Done</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ====================================================================== -->
+  <!-- ADD NEW PROJECT MODAL                                                  -->
+  <!-- ====================================================================== -->
+  <div class="modal-backdrop" id="modal-backdrop" aria-hidden="true">
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div class="modal-header">
+        <div>
+          <h2 id="modal-title">Add Project to Tracker</h2>
+          <p class="modal-subtitle">Syncs immediately across Service Tracks, Project Status Board, and Status Analytics.</p>
+        </div>
+        <button class="close-icon-btn dark" id="btn-close-modal" type="button" aria-label="Close modal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <form id="form-add-project" class="modal-form">
+        <div class="form-grid">
+          <div class="form-field full-span">
+            <label for="f-name">Project Name *</label>
+            <input type="text" id="f-name" required placeholder="e.g., QC Barangay Fiber Optic Supply &amp; Installation" />
+          </div>
+
+          <div class="form-field">
+            <label for="f-column">Service Track Column *</label>
+            <select id="f-column" required>
+              <option value="supply-delivery">Supply &amp; Delivery</option>
+              <option value="supply-only">Supply only</option>
+              <option value="supply-install" selected>Supply &amp; Install</option>
+              <option value="install-services">Install/Services</option>
+            </select>
+          </div>
+
+          <div class="form-field">
+            <label for="f-status">Project Status Column *</label>
+            <select id="f-status" required>
+              <option value="Survey">Survey</option>
+              <option value="Project awarded">Project awarded</option>
+              <option value="On-going project" selected>On-going project</option>
+              <option value="Project completed">Project completed</option>
+              <option value="Hold">Hold</option>
+            </select>
+          </div>
+
+          <div class="form-field">
+            <label for="f-client">Client / Account *</label>
+            <input type="text" id="f-client" required placeholder="e.g., Quezon City LGU / Globe / Ayala Land" />
+          </div>
+
+          <div class="form-field">
+            <label for="f-po">PO / Reference No.</label>
+            <input type="text" id="f-po" placeholder="e.g., PO-2026-8841" />
+          </div>
+
+          <div class="form-field">
+            <label for="f-location">Project Site / Location *</label>
+            <input type="text" id="f-location" required placeholder="e.g., Kamuning, Quezon City" />
+          </div>
+
+          <div class="form-field">
+            <label for="f-pm">Project Lead / PIC *</label>
+            <input type="text" id="f-pm" required placeholder="e.g., Engr. Marco Santos" />
+          </div>
+
+          <div class="form-field">
+            <label for="f-value">Contract Value (&#8369; PHP) *</label>
+            <input type="number" id="f-value" required min="10000" step="10000" placeholder="e.g., 4850000" />
+          </div>
+
+          <div class="form-field">
+            <label for="f-progress">Progress (%) *</label>
+            <input type="number" id="f-progress" required min="0" max="100" value="35" />
+          </div>
+
+          <div class="form-field">
+            <label for="f-priority">Priority *</label>
+            <select id="f-priority" required>
+              <option value="High">High</option>
+              <option value="Normal" selected>Normal</option>
+              <option value="Low">Low</option>
+            </select>
+          </div>
+
+          <div class="form-field">
+            <label for="f-due">Target Completion Date *</label>
+            <input type="date" id="f-due" required value="2027-02-28" />
+          </div>
+
+          <div class="form-field full-span">
+            <label for="f-notes">Scope &amp; Logistics Notes</label>
+            <textarea id="f-notes" rows="2" placeholder="BOM highlights, delivery instructions, permit status, or site readiness..."></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-outline" id="btn-cancel-modal" type="button">Cancel</button>
+          <button class="btn btn-primary" type="submit">Add Project</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ====================================================================== -->
+  <!-- SLIDE-OVER ACCOUNT RECEIVABLE EDITOR DRAWER (PB1–PB10 + AUTO CALC)     -->
+  <!-- ====================================================================== -->
+  <div class="drawer-backdrop" id="ar-drawer-backdrop" aria-hidden="true"></div>
+  <aside class="detail-drawer ar-drawer-wide" id="ar-drawer" role="dialog" aria-modal="true" aria-labelledby="ar-drawer-title" aria-hidden="true">
+    <div class="detail-header">
+      <div>
+        <span class="detail-code" id="ar-drawer-code">AR-2026-001</span>
+        <h2 class="detail-title" id="ar-drawer-title">Account Receivable Record</h2>
+      </div>
+      <button class="close-icon-btn" id="ar-btn-close-drawer" type="button" aria-label="Close Account Receivable editor">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div class="detail-body" id="ar-drawer-body"></div>
+
+    <div class="detail-footer">
+      <button class="btn btn-danger-ghost" id="ar-btn-delete-drawer" type="button">Delete</button>
+      <div class="detail-footer-right">
+        <button class="btn btn-primary" id="ar-btn-save-drawer" type="button">Save AR Record</button>
+      </div>
+    </div>
+  </aside>
+
+  <div class="toast-stack" id="toast-stack" aria-live="polite"></div>
+
+  <script src="data.js"></script>
+  <script src="ar.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
